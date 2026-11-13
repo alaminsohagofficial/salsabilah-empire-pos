@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salsabilah POS - SR Electronics Park (DEAL002905)</title>
+  <style>
+    :root {
+      --primary: #d99b26;
+      --primary-dark: #b88019;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --border: #cbd5e1;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding: 16px; }
+    .container { max-width: 680px; margin: 0 auto; background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .header { border-bottom: 2px solid var(--bg); padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+    .header h2 { margin: 0; font-size: 1.25rem; color: #0f172a; }
+    .badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: #334155; }
+    input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fff; }
+    input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(217, 155, 38, 0.15); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+    .summary-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin: 16px 0; display: flex; justify-content: space-between; font-weight: 600; }
+    .btn-save { width: 100%; background: var(--primary); color: #fff; border: none; padding: 12px; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .btn-save:hover { background: var(--primary-dark); }
+    .ledger-preview { margin-top: 24px; }
+    .ledger-preview h3 { font-size: 1rem; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    th { background: #f1f5f9; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <h2>SR Electronics Park — New Sale</h2>
+      <small style="color:#64748b;">Dealer Code: DEAL002905 | Hatboalia, Alamdanga</small>
+    </div>
+    <span class="badge">● POS Active</span>
+  </div>
+
+  <form id="saleForm">
+    <div class="row">
+      <div class="form-group">
+        <label>কাস্টমারের নাম (Customer Name)</label>
+        <input type="text" id="customerName" placeholder="Walk-In Customer বা কাস্টমারের নাম" required />
+      </div>
+      <div class="form-group">
+        <label>মোবাইল নম্বর (Mobile)</label>
+        <input type="text" id="customerPhone" placeholder="017XXXXXXXX" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>কোম্পানি / ব্র্যান্ড লেজার (Brand Ledger)</label>
+        <select id="brandCategory" required>
+          <option value="Minister Hi-Tech Park">Minister Hi-Tech Park</option>
+          <option value="MyOne Electronics">MyOne Electronics</option>
+          <option value="Butterfly Marketing Limited">Butterfly Marketing Limited (LG / Eco+)</option>
+          <option value="Other / Local">Other / Local Appliance</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>পণ্যের বিবরণ (Product / Model)</label>
+        <input type="text" id="productName" placeholder="যেমন: Refrigerator / Smart TV / AC" required />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label>মোট বিল (Total Amount ৳)</label>
+        <input type="number" id="totalAmount" placeholder="0.00" min="0" step="0.01" required />
+      </div>
+      <div class="form-group">
+        <label>নগদ/জমা (Amount Paid ৳)</label>
+        <input type="number" id="paidAmount" placeholder="0.00" min="0" step="0.01" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>নির্দিষ্ট ডিপোজিট অ্যাকাউন্ট (Deposit To Account)</label>
+      <select id="depositAccount" required>
+        <option value="Showroom Cash Drawer (Hatboalia)">Showroom Cash Drawer (Hatboalia - নগদ)</option>
+        <option value="Pubali Bank - Banani Corp (3311901022846)">Pubali Bank - Banani Corp (A/C: 3311901022846)</option>
+        <option value="Pubali Agent / NexusPay (7017511802593)">Pubali Agent Banking / NexusPay (01719732134)</option>
+        <option value="DBBL - MyOne Account (1041100034560)">Dutch-Bangla Bank - MyOne (A/C: 1041100034560)</option>
+        <option value="Islami Bank - Minister Collection (20503910100020103)">Islami Bank - Minister Collection (A/C: 20503910100020103)</option>
+        <option value="Butterfly Corporate Remittance Ledger">Butterfly Marketing Limited - Corporate Deposit</option>
+      </select>
+    </div>
+
+    <div class="summary-box">
+      <span>বকেয়া থাকবে (Due Amount):</span>
+      <span id="dueDisplay" style="color:#dc2626;">৳ 0.00</span>
+    </div>
+
+    <button type="submit" class="btn-save">🛒 Save Sale & Route Deposit</button>
+  </form>
+
+  <div class="ledger-preview">
+    <h3>সাম্প্রতিক সেলস ও ডিপোজিট এন্ট্রি (Recent Entries)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>কাস্টমার</th>
+          <th>ব্র্যান্ড</th>
+          <th>মোট / জমা</th>
+          <th>ডিপোজিট খাত</th>
+        </tr>
+      </thead>
+      <tbody id="ledgerBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const totalInput = document.getElementById('totalAmount');
+  const paidInput = document.getElementById('paidAmount');
+  const dueDisplay = document.getElementById('dueDisplay');
+  const saleForm = document.getElementById('saleForm');
+  const ledgerBody = document.getElementById('ledgerBody');
+
+  function updateDue() {
+    const total = parseFloat(totalInput.value) || 0;
+    const paid = parseFloat(paidInput.value) || 0;
+    const due = Math.max(0, total - paid);
+    dueDisplay.textContent = `৳ ${due.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  }
+
+  totalInput.addEventListener('input', updateDue);
+  paidInput.addEventListener('input', updateDue);
+
+  function renderEntries() {
+    const entries = JSON.parse(localStorage.getItem('salsabilah_pos_sales') || '[]');
+    ledgerBody.innerHTML = entries.map(item => `
+      <tr>
+        <td><strong>${item.customer}</strong><br><small>${item.product}</small></td>
+        <td>${item.brand}</td>
+        <td>৳${item.total} / <span style="color:#16a34a;">৳${item.paid}</span><br><small style="color:#dc2626;">বাকি: ৳${item.due}</small></td>
+        <td><small>${item.deposit}</small></td>
+      </tr>
+    `).join('');
+  }
+
+  saleForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const total = parseFloat(totalInput.value) || 0;
+    const paid = parseFloat(paidInput.value) || 0;
+    const due = Math.max(0, total - paid);
+
+    const entry = {
+      id: Date.now(),
+      customer: document.getElementById('customerName').value,
+      phone: document.getElementById('customerPhone').value,
+      brand: document.getElementById('brandCategory').value,
+      product: document.getElementById('productName').value,
+      total: total.toFixed(2),
+      paid: paid.toFixed(2),
+      due: due.toFixed(2),
+      deposit: document.getElementById('depositAccount').value,
+      date: new Date().toLocaleString()
+    };
+
+    const entries = JSON.parse(localStorage.getItem('salsabilah_pos_sales') || '[]');
+    entries.unshift(entry);
+    localStorage.setItem('salsabilah_pos_sales', JSON.stringify(entries));
+
+    saleForm.reset();
+    updateDue();
+    renderEntries();
+    alert(`সেলস এন্ট্রি সফল হয়েছে!\nডিপোজিট খাত: ${entry.deposit}`);
+  });
+
+  renderEntries();
+</script>
+
+</body>
+</html>
