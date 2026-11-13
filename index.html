@@ -3,304 +3,394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SAE POS — SR Electronics Park | Salsabilah Amin Limited</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>SR Electronics Park — Salsabilah POS</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #0B1320; color: #F3F4F6; }
-    .glass-card { background: rgba(17, 24, 39, 0.82); backdrop-filter: blur(12px); border: 1px solid rgba(245, 158, 11, 0.22); }
-    .gold-glow { box-shadow: 0 0 24px rgba(245, 158, 11, 0.25); }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 6px; }
-    @media print {
-      body * { visibility: hidden; }
-      #print-receipt, #print-receipt * { visibility: visible; }
-      #print-receipt { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; color: #000 !important; }
+    :root {
+      --bg: #0b1320;
+      --card: #111827;
+      --border: #1f2937;
+      --amber: #f59e0b;
+      --amber-dark: #d97706;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --green: #10b981;
+      --red: #ef4444;
+      --cyan: #06b6d4;
     }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    header {
+      background: #0f172a; border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .logo-box { display: flex; align-items: center; gap: 10px; }
+    .sr-badge {
+      background: linear-gradient(135deg, #fbbf24, #d97706); color: #0b1320;
+      font-weight: 900; padding: 8px 12px; border-radius: 10px; font-size: 16px;
+    }
+    .gemini-tag {
+      background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.4);
+      color: #67e8f9; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    
+    /* Navigation Tabs */
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .tab-btn {
+      background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
+      padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .tab-btn.active { background: var(--amber); color: #0b1320; border-color: var(--amber); }
+    
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Cards & Grid */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+    @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .kpi-card { border-left: 4px solid var(--amber); }
+    .kpi-card small { color: var(--muted); font-size: 12px; display: block; }
+    .kpi-card strong { font-size: 19px; display: block; margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155;
+      border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 12px;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--amber); }
+    .btn-primary {
+      width: 100%; background: var(--amber); color: #0b1320; border: none;
+      padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer;
+    }
+    .btn-sm {
+      background: #1e293b; color: #fff; border: 1px solid #475569;
+      padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+    th { background: #0f172a; color: var(--amber); }
+    .table-wrap { overflow-x: auto; }
+    footer { text-align: center; padding: 16px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 24px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
 
-  <!-- Top Header -->
-  <header class="bg-[#0B1320]/95 backdrop-blur-md border-b border-amber-500/30 sticky top-0 z-50 px-4 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-3">
-    <div class="flex items-center space-x-3">
-      <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black px-3.5 py-2 rounded-xl text-base shadow-lg gold-glow tracking-tighter">SR</div>
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="font-extrabold text-amber-400 tracking-wide text-base sm:text-lg">SR ELECTRONICS PARK</h1>
-          <span class="hidden sm:inline-block px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold">DEAL002905</span>
-        </div>
-        <p class="text-[11px] text-slate-400">An Enterprise of Salsabilah Amin Limited • Hatboalia, Alamdanga, Chuadanga</p>
+<header>
+  <div class="logo-box">
+    <div class="sr-badge">SR</div>
+    <div>
+      <div style="font-weight:800; color:#fbbf24; font-size:16px;">SR ELECTRONICS PARK</div>
+      <div style="font-size:11px; color:#9ca3af;">An Enterprise of Salsabilah Amin Limited • DEAL002905</div>
+    </div>
+  </div>
+  <div class="gemini-tag">✨ Powered by Gemini</div>
+</header>
+
+<div class="container">
+  <!-- ট্যাব বাটনসমূহ -->
+  <div class="tabs">
+    <button type="button" class="tab-btn active" data-target="tab-dashboard">📊 ড্যাশবোর্ড</button>
+    <button type="button" class="tab-btn" data-target="tab-pos">🛒 POS কাউন্টার ও ডিপোজিট</button>
+    <button type="button" class="tab-btn" data-target="tab-customers">👥 গ্রাহক ও বকেয়া</button>
+    <button type="button" class="tab-btn" data-target="tab-products">📦 পণ্য স্টক</button>
+  </div>
+
+  <!-- ১. ড্যাশবোর্ড ট্যাব -->
+  <div id="tab-dashboard" class="tab-panel active">
+    <div class="kpi-grid">
+      <div class="card kpi-card" style="border-left-color:#10b981;">
+        <small>মোট বিক্রয় (৭১০+ ইনভয়েস)</small>
+        <strong id="kpiSales" style="color:#34d399;">৳ 15,443,577</strong>
+      </div>
+      <div class="card kpi-card" style="border-left-color:#ef4444;">
+        <small>গ্রাহক লেজার বকেয়া (৪৫৫ জন)</small>
+        <strong id="kpiDue" style="color:#f87171;">৳ 2,908,829</strong>
+      </div>
+      <div class="card kpi-card" style="border-left-color:#f59e0b;">
+        <small>বর্তমান স্টক ভ্যালু (৩৮৪ পিস)</small>
+        <strong style="color:#fbbf24;">৳ 2,372,889</strong>
+      </div>
+      <div class="card kpi-card" style="border-left-color:#06b6d4;">
+        <small>সরবরাহকারী বকেয়া (২৮ জন)</small>
+        <strong style="color:#22d3ee;">৳ 4,764,185</strong>
       </div>
     </div>
 
-    <div class="flex items-center space-x-3">
-      <span class="bg-cyan-950/80 text-cyan-300 px-3 py-1.5 rounded-full text-xs border border-cyan-500/40 font-semibold shadow-sm">
-        ✨ Powered by Gemini
-      </span>
-      <div class="text-right hidden md:block border-l border-slate-800 pl-3">
-        <p class="text-xs font-bold text-slate-200">MD. AL AMIN SOHAG</p>
-        <p class="text-[10px] text-amber-400">01711995940 | pos@salsabilah.com</p>
+    <div class="card">
+      <h3 style="margin-top:0; color:#fbbf24; font-size:15px;">সাম্প্রতিক বিক্রয় ও ডিপোজিট তালিকা</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ইনভয়েস</th>
+              <th>গ্রাহক</th>
+              <th>ব্র্যান্ড</th>
+              <th>মোট / জমা / বাকি</th>
+              <th>ডিপোজিট খাত</th>
+            </tr>
+          </thead>
+          <tbody id="recentSalesBody"></tbody>
+        </table>
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- Main Workspace -->
-  <main class="flex-1 p-4 sm:p-6 max-w-7xl mx-auto w-full space-y-5">
-
-    <!-- Navigation Tabs -->
-    <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-      <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="nav-tab px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition shadow">
-        <i class="fa-solid fa-chart-pie mr-1.5"></i> ড্যাশবোর্ড ও হিসাব
-      </button>
-      <button onclick="switchTab('pos')" id="tab-btn-pos" class="nav-tab px-4 py-2 bg-slate-800/90 text-slate-300 hover:bg-slate-700 font-semibold rounded-xl text-xs sm:text-sm transition">
-        <i class="fa-solid fa-cash-register mr-1.5"></i> POS কাউন্টার ও ডিপোজিট
-      </button>
-      <button onclick="switchTab('customers')" id="tab-btn-customers" class="nav-tab px-4 py-2 bg-slate-800/90 text-slate-300 hover:bg-slate-700 font-semibold rounded-xl text-xs sm:text-sm transition">
-        <i class="fa-solid fa-users mr-1.5"></i> গ্রাহক ও বকেয়া (<span id="badge-cust-count">455</span>)
-      </button>
-      <button onclick="switchTab('products')" id="tab-btn-products" class="nav-tab px-4 py-2 bg-slate-800/90 text-slate-300 hover:bg-slate-700 font-semibold rounded-xl text-xs sm:text-sm transition">
-        <i class="fa-solid fa-boxes-stacked mr-1.5"></i> পণ্য স্টক (<span id="badge-prod-count">277</span>)
-      </button>
-      <button onclick="switchTab('suppliers')" id="tab-btn-suppliers" class="nav-tab px-4 py-2 bg-slate-800/90 text-slate-300 hover:bg-slate-700 font-semibold rounded-xl text-xs sm:text-sm transition">
-        <i class="fa-solid fa-truck-field mr-1.5"></i> সরবরাহকারী ও ক্রয় (<span id="badge-supp-count">28</span>)
-      </button>
-      <button onclick="exportAllExcel()" class="ml-auto px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm transition shadow">
-        <i class="fa-solid fa-file-excel mr-1.5"></i> Excel ব্যাকআপ
-      </button>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- 1. DASHBOARD SECTION                                      -->
-    <!-- ========================================================= -->
-    <div id="section-dashboard" class="space-y-6">
-      <!-- Primary Reconciled KPIs -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="glass-card p-4 rounded-xl border-l-4 border-emerald-500">
-          <p class="text-xs text-slate-400 font-medium">মোট বিক্রয় (৭১০+ ইনভয়েস)</p>
-          <h3 id="kpi-total-sales" class="text-xl font-extrabold text-emerald-400 mt-1">৳ 15,443,577</h3>
-          <p class="text-[11px] text-slate-400 mt-1">আদায়: <span id="kpi-collected" class="text-slate-200 font-semibold">৳ 12,743,387</span></p>
-        </div>
-
-        <div class="glass-card p-4 rounded-xl border-l-4 border-rose-500">
-          <p class="text-xs text-slate-400 font-medium">গ্রাহক লেজার বকেয়া (৪৫৫ জন)</p>
-          <h3 id="kpi-cust-due" class="text-xl font-extrabold text-rose-400 mt-1">৳ 2,908,829</h3>
-          <p class="text-[11px] text-slate-400 mt-1">ইনভয়েস বকেয়া: <span id="kpi-sales-due" class="text-slate-200 font-semibold">৳ 2,700,190</span></p>
-        </div>
-
-        <div class="glass-card p-4 rounded-xl border-l-4 border-amber-500">
-          <p class="text-xs text-slate-400 font-medium">বর্তমান স্টক ভ্যালু (৩৮৪ পিস)</p>
-          <h3 id="kpi-stock-cost" class="text-xl font-extrabold text-amber-400 mt-1">৳ 2,372,889</h3>
-          <p class="text-[11px] text-slate-400 mt-1">বিক্রয় মূল্য: <span id="kpi-stock-retail" class="text-slate-200 font-semibold">৳ 3,352,350</span></p>
-        </div>
-
-        <div class="glass-card p-4 rounded-xl border-l-4 border-cyan-500">
-          <p class="text-xs text-slate-400 font-medium">সরবরাহকারী বকেয়া (২৮ জন)</p>
-          <h3 id="kpi-supp-due" class="text-xl font-extrabold text-cyan-400 mt-1">৳ 4,764,185</h3>
-          <p class="text-[11px] text-slate-400 mt-1">মোট ক্রয়: <span class="text-slate-200 font-semibold">৳ 16,315,735</span></p>
-        </div>
-      </div>
-
-      <!-- Bank & Deposit Routing Accounts Summary -->
-      <div class="glass-card p-5 rounded-xl">
-        <div class="flex flex-wrap justify-between items-center gap-2 mb-4 border-b border-slate-800 pb-3">
-          <h3 class="font-bold text-amber-400 text-sm sm:text-base"><i class="fa-solid fa-building-columns mr-2"></i> নির্ধারিত ব্যাংক ও ডিপোজিট রাউটিং অ্যাকাউন্টসমূহ</h3>
-          <span class="text-xs text-slate-400">POS থেকে প্রতিটি বিক্রয় সরাসরি নির্বাচিত খাতে জমা হয়</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div class="bg-slate-900/80 p-3.5 rounded-lg border border-slate-800">
-            <span class="text-amber-400 font-bold block">পুবালী ব্যাংক লি. (বনানী কর্পোরেট)</span>
-            <span class="text-slate-300 font-mono block mt-1">A/C: 3311901022846</span>
-            <span class="text-slate-400 text-[11px] block mt-0.5">Minister Hi-Tech Park & Corporate Remittance</span>
+  <!-- ২. POS কাউন্টার ও ডিপোজিট ট্যাব -->
+  <div id="tab-pos" class="tab-panel">
+    <div class="card">
+      <h3 style="margin-top:0; color:#fbbf24; font-size:16px;">+ নতুন বিক্রয় ও নির্দিষ্ট ব্যাংক ডিপোজিট এন্ট্রি</h3>
+      <form id="saleForm">
+        <div class="grid-2">
+          <div>
+            <label>কাস্টমারের নাম</label>
+            <input type="text" id="custName" placeholder="Walk-In Customer বা কাস্টমারের নাম" required />
           </div>
-          <div class="bg-slate-900/80 p-3.5 rounded-lg border border-slate-800">
-            <span class="text-emerald-400 font-bold block">পুবালী এজেন্ট ব্যাংকিং / নেক্সাসপে</span>
-            <span class="text-slate-300 font-mono block mt-1">ID: 01719732134 | A/C: 7017511802593</span>
-            <span class="text-slate-400 text-[11px] block mt-0.5">Card POS & Digital Customer Collections</span>
-          </div>
-          <div class="bg-slate-900/80 p-3.5 rounded-lg border border-slate-800">
-            <span class="text-cyan-400 font-bold block">ডাচ-বাংলা ব্যাংক ও ইসলামী ব্যাংক</span>
-            <span class="text-slate-300 font-mono block mt-1">DBBL: 1041100034560 | IBBL: 20503910100020103</span>
-            <span class="text-slate-400 text-[11px] block mt-0.5">MyOne Pool & Butterfly Marketing Ledger</span>
+          <div>
+            <label>মোবাইল নম্বর</label>
+            <input type="text" id="custPhone" placeholder="017XXXXXXXX" />
           </div>
         </div>
-      </div>
 
-      <!-- Recent Sales Table -->
-      <div class="glass-card rounded-xl overflow-hidden">
-        <div class="px-5 py-3.5 border-b border-slate-800 flex justify-between items-center">
-          <h3 class="font-bold text-amber-400 text-sm sm:text-base"><i class="fa-solid fa-receipt mr-2"></i> সাম্প্রতিক বিক্রয় ও ইনভয়েস (লাইভ + ইমপোর্টেড)</h3>
-          <span id="live-inv-badge" class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-700 px-2.5 py-1 rounded-full font-semibold">সর্বশেষ ইনভয়েস: #000000828</span>
-        </div>
-        <div class="overflow-x-auto max-h-96">
-          <table class="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead class="bg-slate-900 text-slate-300 border-b border-slate-800 sticky top-0">
-              <tr>
-                <th class="p-3">তারিখ ও ইনভয়েস</th>
-                <th class="p-3">গ্রাহক</th>
-                <th class="p-3">পেমেন্ট / ডিপোজিট খাত</th>
-                <th class="p-3 text-right">মোট বিল</th>
-                <th class="p-3 text-right">পরিশোধ</th>
-                <th class="p-3 text-right">বকেয়া</th>
-                <th class="p-3 text-center">রসিদ</th>
-              </tr>
-            </thead>
-            <tbody id="recent-sales-tbody" class="divide-y divide-slate-800/80"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- 2. POS COUNTER & DEPOSIT ROUTING SECTION                  -->
-    <!-- ========================================================= -->
-    <div id="section-pos" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Left: Product Catalog (7 cols) -->
-      <div class="lg:col-span-7 glass-card p-4 sm:p-5 rounded-xl space-y-4">
-        <div class="flex flex-wrap justify-between items-center gap-2">
-          <h3 class="font-bold text-amber-400 text-base"><i class="fa-solid fa-boxes-stacked mr-2"></i> পণ্য নির্বাচন করুন (POS ক্যাটালগ)</h3>
-          <label class="inline-flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
-            <input type="checkbox" id="pos-instock-only" onchange="renderPOSCatalog()" class="rounded text-amber-500">
-            <span>শুধুমাত্র স্টকে থাকা পণ্য (৩৮৪ পিস)</span>
-          </label>
+        <div class="grid-2">
+          <div>
+            <label>কোম্পানি / ব্র্যান্ড লেজার</label>
+            <select id="brandSelect">
+              <option value="Minister Hi-Tech Park">Minister Hi-Tech Park</option>
+              <option value="MyOne Electronics">MyOne Electronics</option>
+              <option value="Butterfly Marketing Limited">Butterfly Marketing Limited (LG / Eco+)</option>
+              <option value="General / Local">General / Local</option>
+            </select>
+          </div>
+          <div>
+            <label>পণ্যের বিবরণ ও মডেল</label>
+            <input type="text" id="prodDesc" placeholder="যেমন: Minister Fridge / LG TV / AC" required />
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input type="text" id="pos-search-input" oninput="renderPOSCatalog()" placeholder="পণ্যের নাম বা SKU খুঁজুন..." class="sm:col-span-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
-          <select id="pos-brand-filter" onchange="renderPOSCatalog()" class="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
-            <option value="ALL">সকল ব্র্যান্ড</option>
+        <div class="grid-2">
+          <div>
+            <label>মোট বিল (৳)</label>
+            <input type="number" id="totalAmt" placeholder="0" required />
+          </div>
+          <div>
+            <label>নগদ / জমা পরিশোধ (৳)</label>
+            <input type="number" id="paidAmt" placeholder="0" required />
+          </div>
+        </div>
+
+        <div>
+          <label>নির্দিষ্ট ডিপোজিট অ্যাকাউন্ট (Deposit Account Routing)</label>
+          <select id="depositSelect">
+            <option value="Showroom Cash Drawer (Hatboalia)">Showroom Cash Drawer (Hatboalia - নগদ)</option>
+            <option value="Pubali Bank - Banani Corp (3311901022846)">Pubali Bank - Banani Corp (A/C: 3311901022846)</option>
+            <option value="Pubali Agent / NexusPay (7017511802593)">Pubali Agent Banking / NexusPay (01719732134)</option>
+            <option value="DBBL - MyOne Account (1041100034560)">Dutch-Bangla Bank - MyOne (A/C: 1041100034560)</option>
+            <option value="Islami Bank - Minister Collection (20503910100020103)">Islami Bank - Minister Collection (A/C: 20503910100020103)</option>
+            <option value="Butterfly Marketing Limited - Corporate Ledger">Butterfly Marketing Limited - Corporate Deposit</option>
           </select>
         </div>
 
-        <div id="pos-product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[520px] overflow-y-auto pr-1"></div>
-      </div>
-
-      <!-- Right: Cart, Customer, Deposit Routing & Checkout (5 cols) -->
-      <div class="lg:col-span-5 glass-card p-4 sm:p-5 rounded-xl flex flex-col justify-between space-y-4">
-        <div class="space-y-3">
-          <h3 class="font-bold text-amber-400 border-b border-slate-800 pb-2 text-base"><i class="fa-solid fa-cart-shopping mr-2"></i> ইনভয়েস ও ডিপোজিট চেকআউট</h3>
-
-          <!-- Customer Search/Select -->
-          <div>
-            <label class="block text-xs text-slate-400 font-semibold mb-1">গ্রাহক নির্বাচন করুন (৪৫৫ জন নিবন্ধিত গ্রাহক)</label>
-            <input type="text" id="pos-customer-input" list="pos-customer-datalist" value="Walk-In Customer" placeholder="গ্রাহকের নাম বা মোবাইল লিখুন..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
-            <datalist id="pos-customer-datalist"></datalist>
-          </div>
-
-          <!-- Cart Items -->
-          <div id="cart-items" class="space-y-2 max-h-52 overflow-y-auto bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 text-xs">
-            <p class="text-slate-500 text-center py-6">বাম পাশ থেকে পণ্যে ক্লিক করে কার্টে যোগ করুন</p>
-          </div>
+        <div style="background:#0f172a; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; justify-content:space-between;">
+          <span>অবশিষ্ট বকেয়া (Due):</span>
+          <strong id="duePreview" style="color:#f87171;">৳ 0</strong>
         </div>
 
-        <!-- Billing & Deposit Account Routing -->
-        <div class="border-t border-slate-800 pt-3 space-y-3">
-          <div class="grid grid-cols-2 gap-2.5">
-            <div>
-              <label class="block text-[11px] text-slate-400 mb-1">ডিসকাউন্ট (৳)</label>
-              <input type="number" id="pos-discount" value="0" min="0" oninput="updateCartTotals()" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white text-right font-bold">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-400 mb-1">নগদ/জমা পরিশোধ (৳)</label>
-              <input type="number" id="pos-paid-amount" value="0" min="0" oninput="updateDueCalculation()" class="w-full px-2.5 py-1.5 bg-slate-900 border border-emerald-600/60 rounded-lg text-sm text-emerald-400 text-right font-bold">
-            </div>
-          </div>
+        <button type="submit" class="btn-primary">🛒 বিক্রি সেভ করুন ও ডিপোজিট কনফার্ম করুন</button>
+      </form>
+    </div>
+  </div>
 
-          <div>
-            <label class="block text-[11px] text-amber-400 font-semibold mb-1">নির্দিষ্ট ডিপোজিট অ্যাকাউন্ট (Deposit Account)</label>
-            <select id="pos-deposit-account" class="w-full px-2.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500">
-              <option value="Showroom Cash Drawer (Hatboalia)">Showroom Cash Drawer (Hatboalia - নগদ)</option>
-              <option value="Pubali Bank - Banani Corp (3311901022846)">Pubali Bank - Banani Corp (A/C: 3311901022846)</option>
-              <option value="Pubali Agent / NexusPay (7017511802593)">Pubali Agent Banking / NexusPay (01719732134)</option>
-              <option value="DBBL - MyOne Account (1041100034560)">Dutch-Bangla Bank - MyOne (A/C: 1041100034560)</option>
-              <option value="Islami Bank - Minister Collection (20503910100020103)">Islami Bank - Minister Collection (20503910100020103)</option>
-              <option value="Butterfly Marketing Limited - Corporate Ledger">Butterfly Marketing Limited - Corporate Deposit</option>
-            </select>
-          </div>
-
-          <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800 space-y-1 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">মোট বিল (Net Payable):</span><span id="cart-net-total" class="font-extrabold text-amber-400 text-sm">৳ 0.00</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">অবশিষ্ট বকেয়া (Due):</span><span id="cart-due-total" class="font-extrabold text-rose-400">৳ 0.00</span></div>
-          </div>
-
-          <button onclick="completeSale()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-xl transition shadow-lg text-sm">
-            <i class="fa-solid fa-check-circle mr-1.5"></i> বিক্রি সম্পন্ন করুন, ডিপোজিট সেভ ও SMS পাঠান
-          </button>
-        </div>
+  <!-- ৩. গ্রাহক ও বকেয়া ট্যাব -->
+  <div id="tab-customers" class="tab-panel">
+    <div class="card">
+      <h3 style="margin-top:0; color:#fbbf24; font-size:16px;">শীর্ষ বকেয়া গ্রাহক ও ডিলার লেজার (মোট বকেয়া: ৳ 2,908,829)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>আইডি</th>
+              <th>গ্রাহক ও প্রতিষ্ঠান</th>
+              <th>মোবাইল</th>
+              <th>বকেয়া (৳)</th>
+              <th>অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody id="custTableBody"></tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-    <!-- ========================================================= -->
-    <!-- 3. CUSTOMERS & DUE LEDGER SECTION (455 RECORDS)           -->
-    <!-- ========================================================= -->
-    <div id="section-customers" class="hidden space-y-4">
-      <div class="flex flex-wrap justify-between items-center gap-3">
-        <div>
-          <h3 class="font-bold text-amber-400 text-lg"><i class="fa-solid fa-users mr-2"></i> গ্রাহক ও বকেয়া লেজার (মোট বকেয়া: ৳ 2,908,828.93)</h3>
-          <p class="text-xs text-slate-400">সকল ৪৫৫ জন নিবন্ধিত কাস্টমার ও ডিলারের বকেয়া তালিকা</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <input type="text" id="cust-search" oninput="renderCustomersTable()" placeholder="নাম, আইডি বা মোবাইল..." class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white">
-          <button onclick="setCustFilter('due')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">🚨 বকেয়া কাস্টমার</button>
-          <button onclick="setCustFilter('all')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition">সকল (৪৫৫)</button>
-        </div>
-      </div>
-
-      <div class="glass-card rounded-xl overflow-hidden">
-        <div class="overflow-x-auto max-h-[540px]">
-          <table class="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead class="bg-slate-900 text-slate-300 border-b border-slate-800 sticky top-0">
-              <tr>
-                <th class="p-3">আইডি</th>
-                <th class="p-3">গ্রাহক ও প্রতিষ্ঠান</th>
-                <th class="p-3">মোবাইল</th>
-                <th class="p-3">গ্রুপ ও ঠিকানা</th>
-                <th class="p-3 text-right">মোট বকেয়া</th>
-                <th class="p-3 text-center">রিমাইন্ডার</th>
-              </tr>
-            </thead>
-            <tbody id="customer-table-body" class="divide-y divide-slate-800/80"></tbody>
-          </table>
-        </div>
+  <!-- ৪. পণ্য স্টক ট্যাব -->
+  <div id="tab-products" class="tab-panel">
+    <div class="card">
+      <h3 style="margin-top:0; color:#fbbf24; font-size:16px;">শোরুম স্টক ও মূল্য তালিকা (২৭৭টি SKU | ৩৮৪ পিস মজুদ)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>পণ্যের নাম ও মডেল</th>
+              <th>ব্র্যান্ড</th>
+              <th>ক্রয় মূল্য</th>
+              <th>বিক্রয় মূল্য</th>
+              <th>স্টক</th>
+            </tr>
+          </thead>
+          <tbody id="prodTableBody"></tbody>
+        </table>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- ========================================================= -->
-    <!-- 4. PRODUCTS INVENTORY SECTION (277 SKUs)                  -->
-    <!-- ========================================================= -->
-    <div id="section-products" class="hidden space-y-4">
-      <div class="flex flex-wrap justify-between items-center gap-3">
-        <div>
-          <h3 class="font-bold text-amber-400 text-lg"><i class="fa-solid fa-box mr-2"></i> পণ্য ইনভেন্টরি ও স্টক লিস্ট (২৭৭টি SKU | ৩৮৪ পিস মজুদ)</h3>
-          <p class="text-xs text-slate-400">ক্রয় মূল্য ভিত্তিক স্টক: ৳ 2,372,888.50 | বিক্রয় মূল্য ভিত্তিক: ৳ 3,352,349.50</p>
-        </div>
-        <div class="flex gap-2">
-          <input type="text" id="prod-search" oninput="renderProductsTable()" placeholder="মডেল, ব্র্যান্ড বা SKU..." class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white">
-          <button onclick="toggleStockOnlyTable()" id="btn-stock-only" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold">শুধু স্টকে আছে</button>
-        </div>
-      </div>
+<footer>
+  SR Electronics Park (An Enterprise of Salsabilah Amin Limited) • Hatboalia, Alamdanga, Chuadanga • <strong>Powered by Gemini</strong>
+</footer>
 
-      <div class="glass-card rounded-xl overflow-hidden">
-        <div class="overflow-x-auto max-h-[540px]">
-          <table class="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead class="bg-slate-900 text-slate-300 border-b border-slate-800 sticky top-0">
-              <tr>
-                <th class="p-3">পণ্যের নাম ও SKU</th>
-                <th class="p-3">ব্র্যান্ড</th>
-                <th class="p-3">বিভাগ / মডেল</th>
-                <th class="p-3 text-right">ক্রয় মূল্য</th>
-                <th class="p-3 text-right">বিক্রয় মূল্য</th>
-                <th class="p-3 text-center">বর্তমান স্টক</th>
-              </tr>
-            </thead>
-            <tbody id="product-table-body" class="divide-y divide-slate-800/80"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+<script>
+  // ১. ট্যাব পরিবর্তন করার নির্ভরযোগ্য ফাংশন
+  var tabButtons = document.querySelectorAll('.tab-btn');
+  var tabPanels = document.querySelectorAll('.tab-panel');
 
-    <!-- ========================================================= -->
-    <!-- 5. SUPPLIERS & PURCHASES SECTION    
+  tabButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var targetId = btn.getAttribute('data-target');
+      tabButtons.forEach(function(b) { b.classList.remove('active'); });
+      tabPanels.forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var targetEl = document.getElementById(targetId);
+      if (targetEl) { targetEl.classList.add('active'); }
+    });
+  });
+
+  // ২. আসল ডেটাবেজ তালিকা
+  var topCustomers = [
+    { id: "Buyer--0006", name: "MD. ABUL BASHAR (BDL Electronics)", phone: "01913809604", due: 416730.20 },
+    { id: "DEALER--002", name: "HASMOT ULLAH (M/S HASMOT ENTERPRISE)", phone: "01711078208", due: 245388.40 },
+    { id: "DEALER--001", name: "MOTIN KHAN (M/S Oishi Electronics)", phone: "01712469868", due: 214498.80 },
+    { id: "CO0443", name: "Taj Electronics", phone: "0007", due: 212776.00 },
+    { id: "REF-0078", name: "BIPLOB HOSSAIN", phone: "01712696580", due: 111074.00 },
+    { id: "CO0423", name: "MD. ROMJAN (BHATPARA ECO)", phone: "01731664486", due: 92240.00 },
+    { id: "OVN-002", name: "DALIYA", phone: "01302424426", due: 61203.00 },
+    { id: "AKASH", name: "AKASH AHMED", phone: "01912157418", due: 60857.18 },
+    { id: "REF-0143", name: "TIPU SULTAN", phone: "01308059208", due: 48600.00 },
+    { id: "AC--0013", name: "SARMIN SULTANA", phone: "01934064626", due: 48298.75 },
+    { id: "CO0526", name: "Afrina", phone: "01777223701", due: 18925.00 },
+    { id: "REF-0149", name: "Abu Bokkor Siddik (Butterfly--TSO--02)", phone: "01713445386", due: 17000.00 }
+  ];
+
+  var stockProducts = [
+    { name: "Minister Inverter AC 1.5 Ton (INV-M18K410WCP-WHT)", brand: "Minister", buy: 63292, sell: 87086, stock: 2 },
+    { name: "Minister Refrigerator M-350EL Peony Paradise", brand: "Minister", buy: 38423, sell: 55807, stock: 2 },
+    { name: "Minister Refrigerator M-350EL Royal Blue Lotus", brand: "Minister", buy: 39193, sell: 55807, stock: 2 },
+    { name: "Minister Refrigerator M-310EL Royal Blue Lotus", brand: "Minister", buy: 36498, sell: 52043, stock: 2 },
+    { name: "ECO+ Refrigerator BCD-320 REC Red Wine", brand: "Butterfly / ECO+", buy: 46367, sell: 52100, stock: 1 },
+    { name: "ECO+ Refrigerator BCD-290 REC Black", brand: "Butterfly / ECO+", buy: 43845, sell: 50700, stock: 1 },
+    { name: "Minister 43 Inch Smart LED TV (MI43QF35FVB)", brand: "Minister", buy: 30900, sell: 49355, stock: 3 },
+    { name: "Minister Refrigerator M-266 Red Spider", brand: "Minister", buy: 45900, sell: 49355, stock: 3 },
+    { name: "Minister Refrigerator M-242EL Gold Magnolia", brand: "Minister", buy: 33033, sell: 48280, stock: 4 },
+    { name: "Minister Washing Machine 10KG (MI-WM-10KG)", brand: "Minister", buy: 39191, sell: 43978, stock: 1 },
+    { name: "MyOne Refrigerator 2E5G Daisy", brand: "MyOne", buy: 28200, sell: 39802, stock: 1 },
+    { name: "ECO+ Geyser 30 Liter (ECWH-D30H)", brand: "Butterfly / ECO+", buy: 10589, sell: 15201, stock: 2 },
+    { name: "Minister Electric Kettle 1.8L (MI-EKX 180)", brand: "Minister", buy: 660, sell: 1074, stock: 48 },
+    { name: "Minister Dry Iron (MIDI631)", brand: "Minister", buy: 1250, sell: 1734, stock: 21 }
+  ];
+
+  var salesList = JSON.parse(localStorage.getItem('sr_pos_sales_clean') || '[]');
+  if (salesList.length === 0) {
+    salesList = [
+      { inv: "000000828", cust: "Afrina", brand: "Minister", total: 28925, paid: 10000, due: 18925, deposit: "Showroom Cash Drawer (Hatboalia)" },
+      { inv: "000000826", cust: "HAJEZA KHATUN", brand: "General", total: 1360, paid: 0, due: 1360, deposit: "Due Ledger" },
+      { inv: "000000825", cust: "MST SUMI KHATUN", brand: "Minister", total: 28970.48, paid: 24000, due: 4970.48, deposit: "Showroom Cash Drawer (Hatboalia)" }
+    ];
+  }
+
+  // ৩. ব্র্যান্ড বদলালে অটো-ডিপোজিট সিলেক্ট
+  document.getElementById('brandSelect').addEventListener('change', function(e) {
+    var val = e.target.value;
+    var dep = document.getElementById('depositSelect');
+    if (val === 'Butterfly Marketing Limited') {
+      dep.value = 'Butterfly Marketing Limited - Corporate Ledger';
+    } else if (val === 'MyOne Electronics') {
+      dep.value = 'DBBL - MyOne Account (1041100034560)';
+    } else if (val === 'Minister Hi-Tech Park') {
+      dep.value = 'Pubali Bank - Banani Corp (3311901022846)';
+    } else {
+      dep.value = 'Showroom Cash Drawer (Hatboalia)';
+    }
+  });
+
+  // ৪. বকেয়া হিসাব লাইভ আপডেট
+  function calcDue() {
+    var t = parseFloat(document.getElementById('totalAmt').value) || 0;
+    var p = parseFloat(document.getElementById('paidAmt').value) || 0;
+    var d = Math.max(0, t - p);
+    document.getElementById('duePreview').textContent = '৳ ' + d.toLocaleString('en-IN');
+  }
+  document.getElementById('totalAmt').addEventListener('input', calcDue);
+  document.getElementById('paidAmt').addEventListener('input', calcDue);
+
+  // ৫. নতুন বিক্রয় সেভ
+  document.getElementById('saleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var t = parseFloat(document.getElementById('totalAmt').value) || 0;
+    var p = parseFloat(document.getElementById('paidAmt').value) || 0;
+    var d = Math.max(0, t - p);
+    var newEntry = {
+      inv: String(829 + salesList.length).padStart(9, '0'),
+      cust: document.getElementById('custName').value,
+      brand: document.getElementById('brandSelect').value,
+      total: t,
+      paid: p,
+      due: d,
+      deposit: document.getElementById('depositSelect').value
+    };
+    salesList.unshift(newEntry);
+    localStorage.setItem('sr_pos_sales_clean', JSON.stringify(salesList));
+    document.getElementById('saleForm').reset();
+    calcDue();
+    renderAll();
+    alert('সফলভাবে বিক্রয় ও ডিপোজিট সেভ হয়েছে! খাত: ' + newEntry.deposit);
+  });
+
+  // ৬. টেবিল রেন্ডার
+  function renderAll() {
+    document.getElementById('recentSalesBody').innerHTML = salesList.map(function(s) {
+      return '<tr>' +
+        '<td><strong>#' + s.inv + '</strong></td>' +
+        '<td>' + s.cust + '</td>' +
+        '<td>' + s.brand + '</td>' +
+        '<td>৳' + s.total + ' / <span style="color:#34d399;">৳' + s.paid + '</span> / <span style="color:#f87171;">৳' + s.due + '</span></td>' +
+        '<td><small>' + s.deposit + '</small></td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('custTableBody').innerHTML = topCustomers.map(function(c) {
+      return '<tr>' +
+        '<td>' + c.id + '</td>' +
+        '<td><strong>' + c.name + '</strong></td>' +
+        '<td>' + c.phone + '</td>' +
+        '<td style="color:#f87171; font-weight:bold;">৳ ' + c.due.toLocaleString('en-IN') + '</td>' +
+        '<td><button type="button" class="btn-sm" onclick="alert(\'SALSABILAH SMS Sent to ' + c.phone + '\')">SMS</button></td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('prodTableBody').innerHTML = stockProducts.map(function(p) {
+      return '<tr>' +
+        '<td><strong>' + p.name + '</strong></td>' +
+        '<td>' + p.brand + '</td>' +
+        '<td>৳ ' + p.buy.toLocaleString('en-IN') + '</td>' +
+        '<td style="color:#34d399; font-weight:bold;">৳ ' + p.sell.toLocaleString('en-IN') + '</td>' +
+        '<td>' + p.stock + ' Pis</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  renderAll();
+</script>
+</body>
+</html>
