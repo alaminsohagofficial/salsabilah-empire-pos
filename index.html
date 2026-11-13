@@ -212,4 +212,203 @@
 
     <!-- Right: Live Ledger & Export -->
     <div class="card">
-      
+      <div class="card-title">
+        <span>সাম্প্রতিক ইনভয়েস ও ডিপোজিট লেজার</span>
+        <button type="button" class="btn btn-sm btn-outline" onclick="exportToCSV()">⬇ CSV ডাউনলোড</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ইনভয়েস ও কাস্টমার</th>
+              <th>ব্র্যান্ড</th>
+              <th>হিসাব (৳)</th>
+              <th>ডিপোজিট খাত</th>
+              <th>রসিদ</th>
+            </tr>
+          </thead>
+          <tbody id="salesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Print Area -->
+<div id="printArea"></div>
+
+<script>
+  const STORAGE_KEY = 'salsabilah_pos_invoices_2026';
+  const BASE_METRICS = {
+    totalSales: 24368727,
+    collected: 18228005,
+    outstandingDue: 2889985.93
+  };
+
+  function loadInvoices() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveInvoices(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  let invoices = loadInvoices();
+
+  const billTotalInput = document.getElementById('billTotal');
+  const billPaidInput = document.getElementById('billPaid');
+  const brandSelect = document.getElementById('brandLedger');
+  const depositSelect = document.getElementById('depositAccount');
+
+  function updateDuePreview() {
+    const total = parseFloat(billTotalInput.value) || 0;
+    const paid = parseFloat(billPaidInput.value) || 0;
+    const due = Math.max(0, total - paid);
+    document.getElementById('netDueText').textContent = `৳ ${due.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  billTotalInput.addEventListener('input', updateDuePreview);
+  billPaidInput.addEventListener('input', updateDuePreview);
+
+  // Auto-select Deposit Account based on Brand
+  brandSelect.addEventListener('change', (e) => {
+    const brand = e.target.value;
+    if (brand === 'Butterfly Marketing Limited') {
+      depositSelect.value = 'Butterfly Corporate Remittance Ledger';
+    } else if (brand === 'MyOne Electronics') {
+      depositSelect.value = 'DBBL - MyOne Account (1041100034560)';
+    } else if (brand === 'Minister Hi-Tech Park') {
+      depositSelect.value = 'Pubali Bank - Banani Corp (3311901022846)';
+    } else {
+      depositSelect.value = 'Showroom Cash Drawer (Hatboalia)';
+    }
+  });
+
+  function renderDashboard() {
+    let addedSales = 0, addedCollected = 0, addedDue = 0;
+    invoices.forEach(inv => {
+      addedSales += inv.total;
+      addedCollected += inv.paid;
+      addedDue += inv.due;
+    });
+
+    document.getElementById('kpiTotalSales').textContent = `৳ ${Math.round(BASE_METRICS.totalSales + addedSales).toLocaleString('en-IN')}`;
+    document.getElementById('kpiCollected').textContent = `৳ ${Math.round(BASE_METRICS.collected + addedCollected).toLocaleString('en-IN')}`;
+    document.getElementById('kpiDue').textContent = `৳ ${Math.round(BASE_METRICS.outstandingDue + addedDue).toLocaleString('en-IN')}`;
+    document.getElementById('kpiTodayCount').textContent = `${invoices.length} টি ইনভয়েস`;
+
+    const tbody = document.getElementById('salesTableBody');
+    if (invoices.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:18px;">এখনো কোনো নতুন ইনভয়েস এন্ট্রি করা হয়নি। বাম পাশের ফর্ম থেকে নতুন বিক্রয় যোগ করুন।</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = invoices.map((inv, idx) => {
+      const badgeClass = inv.brand.includes('Butterfly') ? 'tag tag-butterfly' : 'tag tag-minister';
+      return `
+        <tr>
+          <td>
+            <strong>#${inv.invoiceNo}</strong> — ${inv.customer}<br>
+            <small style="color:#64748b;">${inv.product} (${inv.date})</small>
+          </td>
+          <td><span class="${badgeClass}">${inv.brand}</span></td>
+          <td>
+            মোট: ৳${inv.total.toLocaleString('en-IN')}<br>
+            <small style="color:#16a34a;">জমা: ৳${inv.paid.toLocaleString('en-IN')}</small> | 
+            <small style="color:#dc2626;">বাকি: ৳${inv.due.toLocaleString('en-IN')}</small>
+          </td>
+          <td><small>${inv.depositTo}</small></td>
+          <td><button type="button" class="btn btn-sm btn-outline" onclick="printInvoice(${idx})">🖨 প্রিন্ট</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('posForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const total = parseFloat(billTotalInput.value) || 0;
+    const paid = parseFloat(billPaidInput.value) || 0;
+    const due = Math.max(0, total - paid);
+    const invNum = String(829 + invoices.length).padStart(9, '0');
+
+    const newInv = {
+      invoiceNo: invNum,
+      date: new Date().toLocaleString('en-GB', { hour12: true }),
+      customer: document.getElementById('custName').value.trim(),
+      phone: document.getElementById('custPhone').value.trim() || 'N/A',
+      brand: brandSelect.value,
+      group: document.getElementById('custGroup').value,
+      product: document.getElementById('productDesc').value.trim(),
+      total: Number(total.toFixed(2)),
+      paid: Number(paid.toFixed(2)),
+      due: Number(due.toFixed(2)),
+      depositTo: depositSelect.value
+    };
+
+    invoices.unshift(newInv);
+    saveInvoices(invoices);
+    document.getElementById('posForm').reset();
+    updateDuePreview();
+    renderDashboard();
+  });
+
+  function printInvoice(index) {
+    const inv = invoices[index];
+    if (!inv) return;
+    const printArea = document.getElementById('printArea');
+    printArea.style.display = 'block';
+    printArea.innerHTML = `
+      <div style="font-family: Arial, sans-serif; max-width: 420px; margin: 0 auto; padding: 16px; border: 1px solid #000;">
+        <h2 style="text-align:center; margin:0;">SR ELECTRONICS PARK</h2>
+        <p style="text-align:center; margin:4px 0; font-size:12px;">Dealer Code: DEAL002905 | Hatboalia, Alamdanga, Chuadanga</p>
+        <hr>
+        <p style="font-size:13px;"><strong>Invoice No:</strong> #${inv.invoiceNo}<br>
+        <strong>Date:</strong> ${inv.date}<br>
+        <strong>Customer:</strong> ${inv.customer} (${inv.phone})<br>
+        <strong>Brand Ledger:</strong> ${inv.brand}</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:10px 0;">
+          <tr style="border-bottom:1px solid #000;"><th style="text-align:left;">Product</th><th style="text-align:right;">Amount</th></tr>
+          <tr><td style="padding:6px 0;">${inv.product}</td><td style="text-align:right;">৳ ${inv.total.toFixed(2)}</td></tr>
+        </table>
+        <hr>
+        <p style="font-size:13px; text-align:right;">
+          <strong>Total Bill:</strong> ৳ ${inv.total.toFixed(2)}<br>
+          <strong>Paid Amount:</strong> ৳ ${inv.paid.toFixed(2)}<br>
+          <strong>Due Amount:</strong> ৳ ${inv.due.toFixed(2)}
+        </p>
+        <p style="font-size:11px;"><strong>Deposit Account:</strong> ${inv.depositTo}</p>
+        <p style="text-align:center; font-size:11px; margin-top:16px;">Powered by Salsabilah POS — Salsabilah Amin Limited</p>
+      </div>
+    `;
+    window.print();
+    printArea.style.display = 'none';
+  }
+
+  function exportToCSV() {
+    if (!invoices.length) {
+      alert('ডাউনলোড করার মতো কোনো নতুন ইনভয়েস এখনো নেই।');
+      return;
+    }
+    const headers = ['Invoice No', 'Date', 'Customer', 'Phone', 'Brand Ledger', 'Customer Group', 'Product', 'Total Bill', 'Paid', 'Due', 'Deposit Account'];
+    const rows = invoices.map(i => [
+      i.invoiceNo, `"${i.date}"`, `"${i.customer}"`, `"${i.phone}"`, `"${i.brand}"`, `"${i.group}"`, `"${i.product}"`, i.total, i.paid, i.due, `"${i.depositTo}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csvContent));
+    link.setAttribute('download', `SR_Electronics_Park_Sales_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  renderDashboard();
+</script>
+</body>
+</html>
