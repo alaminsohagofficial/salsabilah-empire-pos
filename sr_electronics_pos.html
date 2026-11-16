@@ -1,0 +1,355 @@
+```html
+<!DOCTYPE html>
+<html lang="bn" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SR Electronics Park — Sovereign POS | Powered by Gemini</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-main: #090d16;
+      --bg-panel: #111827;
+      --bg-card: #161f30;
+      --bg-input: #1e293b;
+      --border-color: #263248;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --gold: #f59e0b;
+      --gold-light: #fde68a;
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --gold-glow: rgba(245, 158, 11, 0.25);
+    }
+    html.light-mode {
+      --bg-main: #f1f5f9;
+      --bg-panel: #ffffff;
+      --bg-card: #ffffff;
+      --bg-input: #f8fafc;
+      --border-color: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      overflow-x: hidden;
+    }
+    .sr-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+    }
+    .sr-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .sr-card:hover {
+      border-color: rgba(6, 182, 212, 0.45);
+    }
+    .sr-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      outline: none;
+    }
+    .sr-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px var(--cyan-glow);
+    }
+    .sr-gold-gradient {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 55%, #b45309 100%);
+    }
+    .sr-cyan-gold-glow {
+      box-shadow: 0 0 18px var(--cyan-glow), 0 0 10px var(--gold-glow);
+    }
+    .nav-btn.active {
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.16), rgba(245, 158, 11, 0.12));
+      border-left: 3px solid #22d3ee;
+      color: #22d3ee;
+    }
+    html.light-mode .nav-btn.active {
+      color: #0e7490;
+      border-left-color: #0891b2;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
+    @media print {
+      body * { visibility: hidden !important; }
+      #receiptPrintArea, #receiptPrintArea * { visibility: visible !important; }
+      #receiptPrintArea {
+        position: fixed !important;
+        left: 0; top: 0; width: 100%;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 16px !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden"></div>
+
+  <div class="flex flex-1 min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 sr-panel flex flex-col transition-transform duration-200 -translate-x-full lg:translate-x-0 shrink-0">
+      <!-- Brand Header with Golden 3D SR Monogram & Cyan/Gold Glow -->
+      <div class="p-4 border-b border-[var(--border-color)] flex items-center justify-between gap-2">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 rounded-xl bg-slate-950 border border-amber-400/50 sr-cyan-gold-glow flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 64 64" class="w-8 h-8" aria-hidden="true">
+              <defs>
+                <linearGradient id="srGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FEF08A"/>
+                  <stop offset="45%" stop-color="#F59E0B"/>
+                  <stop offset="100%" stop-color="#92400E"/>
+                </linearGradient>
+                <filter id="srGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#22D3EE" flood-opacity="0.75"/>
+                </filter>
+              </defs>
+              <rect x="4" y="4" width="56" height="56" rx="14" fill="none" stroke="url(#srGoldGrad)" stroke-width="2.5" filter="url(#srGlow)"/>
+              <text x="32" y="41" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="25" fill="url(#srGoldGrad)" letter-spacing="-1">SR</text>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="font-extrabold text-sm tracking-tight truncate bg-gradient-to-r from-amber-300 via-yellow-400 to-cyan-300 bg-clip-text text-transparent">SR Electronics Park</div>
+            <div class="text-[10px] text-[var(--text-muted)] truncate">Salsabilah Amin Limited</div>
+          </div>
+        </div>
+        <button id="closeSidebarBtn" type="button" class="lg:hidden p-1.5 rounded-lg hover:bg-slate-800/50 text-[var(--text-muted)]" aria-label="Close menu">✕</button>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto text-sm font-medium" id="mainNav">
+        <button type="button" data-tab="dashboard" class="nav-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>📊</span><span data-i18n="nav_dashboard">ড্যাশবোর্ড</span>
+        </button>
+        <button type="button" data-tab="pos" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>🛒</span><span data-i18n="nav_pos">POS বিক্রয়</span>
+        </button>
+        <button type="button" data-tab="products" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>📦</span><span data-i18n="nav_products">পণ্য ও স্টক</span>
+        </button>
+        <button type="button" data-tab="sales" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>🧾</span><span data-i18n="nav_sales">বিক্রয় ও ইনভয়েস</span>
+        </button>
+        <button type="button" data-tab="purchases" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>📥</span><span data-i18n="nav_purchases">ক্রয় ও ব্যয়</span>
+        </button>
+        <button type="button" data-tab="contacts" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>👥</span><span data-i18n="nav_contacts">গ্রাহক ও সরবরাহকারী</span>
+        </button>
+        <button type="button" data-tab="reports" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>🛡️</span><span data-i18n="nav_reports">রিপোর্ট ও ডেটা ব্যাকআপ</span>
+        </button>
+      </nav>
+
+      <!-- Mandatory Powered by Gemini Badge -->
+      <div class="p-3 border-t border-[var(--border-color)] space-y-2">
+        <div class="px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-500/10 to-amber-500/10 border border-cyan-500/30 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span class="text-xs font-bold tracking-wide text-cyan-400">Powered by Gemini</span>
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">LOCAL</span>
+        </div>
+        <div class="text-[11px] text-[var(--text-muted)] px-1 leading-tight">
+          ১০০% নিজস্ব ব্রাউজার স্টোরেজ — থার্ড-পার্টি রিস্কমুক্ত
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Top Header -->
+      <header class="sr-panel px-4 py-3 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-30">
+        <div class="flex items-center gap-2">
+          <button id="openSidebarBtn" type="button" class="lg:hidden px-2.5 py-1.5 rounded-lg sr-input text-sm font-semibold" aria-label="Open menu">☰</button>
+          <button id="quickPosBtn" type="button" class="px-3.5 py-1.5 rounded-lg sr-gold-gradient text-slate-950 font-bold text-xs sm:text-sm shadow hover:opacity-95 transition flex items-center gap-1.5">
+            <span>⚡</span><span data-i18n="btn_quick_pos">POS টার্মিনাল</span>
+          </button>
+          <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+            ✨ Powered by Gemini
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span id="headerDateBadge" class="hidden md:inline-block px-2.5 py-1 rounded-lg sr-input text-xs font-semibold"></span>
+          <button id="calcOpenBtn" type="button" class="px-2.5 py-1.5 rounded-lg sr-input text-xs sm:text-sm font-semibold hover:border-cyan-400 transition" title="Calculator">🧮</button>
+          <button id="langToggleBtn" type="button" class="px-2.5 py-1.5 rounded-lg sr-input text-xs font-bold hover:border-amber-400 transition">EN</button>
+          <button id="themeToggleBtn" type="button" class="px-2.5 py-1.5 rounded-lg sr-input text-xs sm:text-sm font-semibold hover:border-amber-400 transition" title="Toggle Light/Dark">☀️</button>
+        </div>
+      </header>
+
+      <!-- Page Views -->
+      <main class="flex-1 p-3 sm:p-5 space-y-5 max-w-[1600px] w-full mx-auto">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section space-y-5">
+          <div class="sr-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-amber-400">
+            <div>
+              <h1 class="text-lg sm:text-xl font-extrabold" data-i18n="dash_welcome">স্বাগতম, SR Electronics Park</h1>
+              <p class="text-xs sm:text-sm text-[var(--text-muted)]">An Enterprise of Salsabilah Amin Limited • Sovereign Local POS • <span class="text-cyan-400 font-semibold">Powered by Gemini</span></p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <select id="dashPeriodFilter" class="sr-input rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold">
+                <option value="all">সব সময় (All Time)</option>
+                <option value="month">এই মাস (This Month)</option>
+                <option value="today">আজ (Today)</option>
+              </select>
+              <button id="dashGoPosBtn" type="button" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-bold transition">+ নতুন বিক্রয়</button>
+            </div>
+          </div>
+
+          <!-- 8 KPI Cards -->
+          <div id="kpiGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"></div>
+
+          <!-- Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="sr-card rounded-2xl p-4">
+              <h3 class="text-sm font-bold mb-3 flex items-center gap-2"><span class="text-cyan-400">📊</span> বিক্রয়, ক্রয় ও ব্যয় তুলনা</h3>
+              <div class="relative h-64 sm:h-72"><canvas id="chartComparison"></canvas></div>
+            </div>
+            <div class="sr-card rounded-2xl p-4">
+              <h3 class="text-sm font-bold mb-3 flex items-center gap-2"><span class="text-amber-400">🥧</span> বাকি ও নগদ অবস্থান</h3>
+              <div class="relative h-64 sm:h-72"><canvas id="chartDue"></canvas></div>
+            </div>
+          </div>
+
+          <div class="sr-card rounded-2xl p-4">
+            <h3 class="text-sm font-bold mb-3 flex items-center gap-2"><span class="text-cyan-400">📈</span> সাম্প্রতিক বিক্রয় প্রবণতা</h3>
+            <div class="relative h-64"><canvas id="chartTrend"></canvas></div>
+          </div>
+
+          <!-- Alerts & Dues -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="sr-card rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-amber-400">⚠️ লো-স্টক অ্যালার্ট</h3>
+                <span id="lowStockCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">0</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs sm:text-sm text-left">
+                  <thead><tr class="border-b border-[var(--border-color)] text-[var(--text-muted)]"><th class="py-2">পণ্য</th><th class="py-2">SKU</th><th class="py-2 text-right">স্টক</th></tr></thead>
+                  <tbody id="dashLowStockBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="sr-card rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-cyan-400">💳 বকেয়া ইনভয়েস (Receivables)</h3>
+                <span id="dueInvoiceCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold">0</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs sm:text-sm text-left">
+                  <thead><tr class="border-b border-[var(--border-color)] text-[var(--text-muted)]"><th class="py-2">ইনভয়েস</th><th class="py-2">গ্রাহক</th><th class="py-2 text-right">বাকি</th><th class="py-2 text-right">অ্যাকশন</th></tr></thead>
+                  <tbody id="dashDueBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. POS TERMINAL VIEW -->
+        <section id="view-pos" class="view-section hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <!-- Left: Product Catalog -->
+            <div class="lg:col-span-7 sr-card rounded-2xl p-4 flex flex-col gap-3">
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="posSearchInput" type="text" class="sr-input rounded-xl px-3.5 py-2.5 text-sm flex-1" placeholder="🔍 পণ্যের নাম, SKU বা বারকোড দিয়ে খুঁজুন..." />
+                <select id="posCategoryFilter" class="sr-input rounded-xl px-3 py-2.5 text-sm font-semibold sm:w-48">
+                  <option value="all">সব ক্যাটাগরি</option>
+                </select>
+              </div>
+              <div id="posProductGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[560px] overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Right: Cart & Checkout -->
+            <div class="lg:col-span-5 sr-card rounded-2xl p-4 flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-base font-extrabold flex items-center gap-2">🧾 বর্তমান বিল <span id="posCartCount" class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">0</span></h2>
+                <button id="posClearCartBtn" type="button" class="text-xs px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 font-semibold">রিসেট</button>
+              </div>
+
+              <!-- Customer Selector -->
+              <div class="flex gap-2">
+                <select id="posCustomerSelect" class="sr-input rounded-xl px-3 py-2 text-sm flex-1"></select>
+                <button id="posQuickAddCustomerBtn" type="button" class="px-3 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-bold text-sm" title="নতুন গ্রাহক">+ গ্রাহক</button>
+              </div>
+
+              <!-- Cart Items -->
+              <div id="posCartItems" class="flex-1 min-h-[180px] max-h-[280px] overflow-y-auto space-y-2 border-y border-[var(--border-color)] py-2"></div>
+
+              <!-- Totals & Payment -->
+              <div class="space-y-2 text-xs sm:text-sm">
+                <div class="flex justify-between"><span class="text-[var(--text-muted)]">সাবটোটাল:</span><span id="posSubtotalVal" class="font-bold">৳0.00</span></div>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-[var(--text-muted)]">ছাড় (Discount):</span>
+                  <div class="flex items-center gap-1.5">
+                    <input id="posDiscountInput" type="number" min="0" value="0" class="sr-input rounded-lg px-2 py-1 w-20 text-right font-semibold" />
+                    <select id="posDiscountType" class="sr-input rounded-lg px-2 py-1 font-semibold">
+                      <option value="fixed">৳</option>
+                      <option value="percent">%</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                  <label class="flex items-center gap-1.5 text-[var(--text-muted)] cursor-pointer">
+                    <input id="posVatToggle" type="checkbox" class="accent-cyan-400" /> ভ্যাট/ট্যাক্স (5%)
+                  </label>
+                  <span id="posVatVal" class="font-semibold">৳0.00</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-[var(--border-color)] text-base sm:text-lg font-extrabold">
+                  <span>সর্বমোট প্রদেয়:</span>
+                  <span id="posGrandTotalVal" class="text-amber-400">৳0.00</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <div>
+                    <label class="block text-[11px] text-[var(--text-muted)] mb-1">পেমেন্ট মাধ্যম</label>
+                    <select id="posPaymentMethod" class="sr-input rounded-lg px-2.5 py-2 w-full text-xs sm:text-sm font-semibold">
+                      <option value="Cash">নগদ (Cash)</option>
+                      <option value="bKash">বিকাশ (bKash)</option>
+                      <option value="Nagad">নগদ অ্যাপ (Nagad)</option>
+                      <option value="Card">ব্যাংক কার্ড</option>
+                      <option value="Due">বাকি (Credit/Due)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-[var(--text-muted)] mb-1">জমা টাকা (Paid)</label>
+                    <input id="posPaidInput" type="number" min="0" value="0" class="sr-input rounded-lg px-2.5 py-2 w-full text-right font-bold text-cyan-400" />
+                  </div>
+                </div>
+                <div class="flex justify-between text-xs font-semibold pt-1">
+                  <span id="posBalanceLabel" class="text-[var(--text-muted)]">বাকি / ফেরত:</span>
+                  <span id="posBalanceVal">৳0.00</span>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] text-[var(--text-muted)] mb-1">ইনভয়েস লেআউট (Invoice Layout)</label>
+                <select id="posInvoiceLayoutSelect" class="sr-input rounded-lg px-2.5 py-2 w-full text-xs sm:text-sm font-semibold"></select>
+              </div>
+
+              <button id="posCompleteSaleBtn" type="button" class="w-full py-3 rounded-xl sr-gold-gradient text-slate-950 font-extrabold text-sm shadow-lg hover:opacity-95 transition">
+                ✅ বিল সম্পন্ন ও রসিদ প্রিন্ট করুন
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. PRODUCTS & INVENTORY VIEW -->
+        <section id="view-products" class="view-section hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-extrabold">📦 পণ
