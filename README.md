@@ -1,26 +1,51 @@
-# Salsabilah POS — SR Electronics Park (DEAL002905)
+SR Electronics Park — Sovereign POS
+An Enterprise of Salsabilah Amin Limited • Powered by Gemini
+A 100% browser-based, single-file Point of Sale (POS), inventory, and accounting web application built for SR Electronics Park. All operational data is stored locally in the browser (localStorage), with zero third-party backend dependencies and full JSON backup/restore control.
+Core Modules
+Module
+Bengali Label
+Key Capabilities
+Dashboard
+ড্যাশবোর্ড
+8 real-time KPI cards, period filter (All Time, This Month, Today), 3 Chart.js visualizations, low-stock alerts, and due invoice collection
+POS Terminal
+POS বিক্রয়
+Live product search & category filter, cart controls, quick-add customer, fixed/% discount, optional 5% VAT, multi-method payments (Cash, bKash, Nagad, Card, Due), and print-ready receipt
+Products & Stock
+পণ্য ও স্টক
+Add, edit, and delete products with SKU, category, warranty, cost/sale price, stock count, alert threshold, and CSV export
+Sales & Invoices
+বিক্রয় ও ইনভয়েস
+Searchable invoice history, Paid/Due status filter, due collection, receipt re-printing, and CSV export
+Purchases & Expenses
+ক্রয় ও ব্যয়
+Supplier stock purchase entry (auto-updates stock & supplier due) and categorized business expense logging
+Customers & Suppliers
+গ্রাহক ও সরবরাহকারী
+Customer/supplier directory with due tracking and one-click due settlement
+Reports & Backup
+রিপোর্ট ও ডেটা ব্যাকআপ
+Profit & Loss summary (Gross Sales, COGS, Expenses, Net Profit), full JSON export/import restore, and demo data reset
 
-**Salsabilah POS** হলো **SR Electronics Park** (হাটবোয়ালিয়া বাজার, আলমডাঙ্গা, চুয়াডাঙ্গা) এবং **Salsabilah Amin Limited**-এর জন্য নির্মিত একটি পূর্ণাঙ্গ পয়েন্ট অফ সেল (POS), ইনভয়েস জেনারেশন এবং নির্দিষ্ট ব্যাংক ডিপোজিট রাউটিং সিস্টেম।
+Built-In Utilities
+Bilingual Interface (BN / EN): Instant switching between Bengali and English navigation labels.
+Theme Toggle (Dark / Light): Sovereign dark mode with golden SR monogram and cyan/gold accents, plus a high-contrast light mode.
+Quick Calculator: Built-in modal calculator accessible from the top header.
+Print-Ready Receipts: Dedicated @media print styling for clean invoice printing.
+Tech Stack
+Structure & Logic: Single-file HTML5 + Vanilla JavaScript (ES6+)
+Styling: Tailwind CSS (3.4.17 CDN) + CSS custom properties
+Charts: Chart.js (4.4.1 CDN)
+Typography: Google Fonts (Inter & Noto Sans Bengali)
+Storage: Browser localStorage (sr_electronics_sovereign_pos_v1)
+Quick Start
+Clone the repository:
+git clone https://github.com/alaminsohagofficial/salsabilah-empire-pos.git
+cd salsabilah-empire-pos
 
----
 
-## লাইভ ওয়েব লিংক (Live Deployment)
-* **GitHub Pages URL:** [https://alaminsohagofficial.github.io/salsabilah-empire-pos/](https://alaminsohagofficial.github.io/salsabilah-empire-pos/)
-* **Repository:** `alaminsohagofficial/salsabilah-empire-pos`
-* **Proprietor:** Md. Al Amin Sohag (`alaminsohag2024@gmail.com`)
-
----
-
-## মূল বৈশিষ্ট্যসমূহ (Key Features)
-
-1. **ব্র্যান্ডভিত্তিক সেলস ও লেজার ম্যানেজমেন্ট:**
-   * **Minister Hi-Tech Park**
-   * **MyOne Electronics**
-   * **Butterfly Marketing Limited** (LG / Eco+)
-   * **General / Local Stock**
-2. **অটোমেটেড ব্যাংক ও ক্যাশ ডিপোজিট রাউটিং:**
-   * **Showroom Cash Drawer:** হাটবোয়ালিয়া শোরুমের নগদ লেনদেন।
-   * **Pubali Bank Limited (Banani Corporate Branch):** কর্পোরেট অ্যাকাউন্ট `3311901022846`।
-   * **Pubali Agent Banking / NexusPay:** আইডি `01719732134` (অ্যাকাউন্ট `7017511802593`)।
-   * **Dutch-Bangla Bank PLC (MyOne Account):** অ্যাকাউন্ট `1041100034560`।
-   * 
+Open index.html (or sr_electronics_pos.html) directly in any modern web browser, or deploy the repository with GitHub Pages for instant web access.
+Data Sovereignty & Backup
+No data is transmitted to external servers; all records remain in your local browser storage.
+Use রিপোর্ট ও ডেটা ব্যাকআপ → সম্পূর্ণ ব্যাকআপ (JSON) regularly to download a portable backup file, and ব্যাকআপ রিস্টোর (JSON) to restore on any device.
+SR Electronics Park — An Enterprise of Salsabilah Amin Limited • Powered by Gemini
