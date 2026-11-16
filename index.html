@@ -149,6 +149,9 @@
         <button type="button" data-tab="contacts" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
           <span>👥</span><span data-i18n="nav_contacts">গ্রাহক ও সরবরাহকারী</span>
         </button>
+        <button type="button" data-tab="settlements" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
+          <span>🏢</span><span data-i18n="nav_settlements">কোম্পানি সেটেলমেন্ট ও লেজার</span>
+        </button>
         <button type="button" data-tab="reports" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition">
           <span>🛡️</span><span data-i18n="nav_reports">রিপোর্ট ও ডেটা ব্যাকআপ</span>
         </button>
@@ -352,4 +355,433 @@
         <section id="view-products" class="view-section hidden space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 class="text-lg font-extrabold">📦 পণ
+              <h2 class="text-lg font-extrabold">📦 পণ্য ও ইনভেন্টরি তালিকা</h2>
+              <p class="text-xs text-[var(--text-muted)]">স্টক, ওয়ারেন্টি, ক্রয় ও বিক্রয় মূল্য পরিচালনা করুন</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button id="exportProductsCsvBtn" type="button" class="px-3 py-2 rounded-xl sr-input text-xs sm:text-sm font-semibold hover:border-cyan-400">⬇️ CSV এক্সপোর্ট</button>
+              <button id="openAddProductBtn" type="button" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-bold">+ নতুন পণ্য যোগ</button>
+            </div>
+          </div>
+          <div class="sr-card rounded-2xl p-4 space-y-3">
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="prodTableSearch" type="text" class="sr-input rounded-xl px-3.5 py-2 text-sm flex-1" placeholder="পণ্য, SKU বা ব্র্যান্ড খুঁজুন..." />
+              <select id="prodTableCatFilter" class="sr-input rounded-xl px-3 py-2 text-sm sm:w-48"><option value="all">সব ক্যাটাগরি</option></select>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs sm:text-sm text-left">
+                <thead>
+                  <tr class="border-b border-[var(--border-color)] text-[var(--text-muted)]">
+                    <th class="py-2.5 px-2">SKU</th>
+                    <th class="py-2.5 px-2">পণ্যের নাম</th>
+                    <th class="py-2.5 px-2">ক্যাটাগরি</th>
+                    <th class="py-2.5 px-2">ওয়ারেন্টি</th>
+                    <th class="py-2.5 px-2 text-right">ক্রয়মূল্য</th>
+                    <th class="py-2.5 px-2 text-right">বিক্রয়মূল্য</th>
+                    <th class="py-2.5 px-2 text-right">স্টক</th>
+                    <th class="py-2.5 px-2 text-right">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. SALES & INVOICES VIEW -->
+        <section id="view-sales" class="view-section hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-extrabold">🧾 বিক্রয় ও ইনভয়েস সমূহ</h2>
+              <p class="text-xs text-[var(--text-muted)]">সব POS বিল, বকেয়া আদায় এবং ইনভয়েস প্রিন্ট</p>
+            </div>
+            <button id="exportSalesCsvBtn" type="button" class="px-3 py-2 rounded-xl sr-input text-xs sm:text-sm font-semibold hover:border-cyan-400">⬇️ বিক্রয় CSV</button>
+          </div>
+          <div class="sr-card rounded-2xl p-4 space-y-3">
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="salesSearchInput" type="text" class="sr-input rounded-xl px-3.5 py-2 text-sm flex-1" placeholder="ইনভয়েস নং বা গ্রাহকের নাম..." />
+              <select id="salesStatusFilter" class="sr-input rounded-xl px-3 py-2 text-sm sm:w-44">
+                <option value="all">সব স্ট্যাটাস</option>
+                <option value="paid">পরিশোধিত (Paid)</option>
+                <option value="due">বাকি (Due/Partial)</option>
+              </select>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs sm:text-sm text-left">
+                <thead>
+                  <tr class="border-b border-[var(--border-color)] text-[var(--text-muted)]">
+                    <th class="py-2.5 px-2">ইনভয়েস</th>
+                    <th class="py-2.5 px-2">তারিখ</th>
+                    <th class="py-2.5 px-2">গ্রাহক</th>
+                    <th class="py-2.5 px-2">মাধ্যম</th>
+                    <th class="py-2.5 px-2 text-right">মোট</th>
+                    <th class="py-2.5 px-2 text-right">জমা</th>
+                    <th class="py-2.5 px-2 text-right">বাকি</th>
+                    <th class="py-2.5 px-2 text-right">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. PURCHASES & EXPENSES VIEW -->
+        <section id="view-purchases" class="view-section hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Add Purchase -->
+            <div class="sr-card rounded-2xl p-4 space-y-3">
+              <h3 class="text-base font-extrabold text-cyan-400">📥 নতুন পণ্য ক্রয় (Stock Purchase)</h3>
+              <form id="purchaseForm" class="space-y-3 text-sm">
+                <div>
+                  <label class="block text-xs text-[var(--text-muted)] mb-1">সরবরাহকারী (Supplier)</label>
+                  <select id="purSupplierSelect" class="sr-input rounded-xl px-3 py-2 w-full" required></select>
+                </div>
+                <div>
+                  <label class="block text-xs text-[var(--text-muted)] mb-1">পণ্য নির্বাচন করুন</label>
+                  <select id="purProductSelect" class="sr-input rounded-xl px-3 py-2 w-full" required></select>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label class="block text-xs text-[var(--text-muted)] mb-1">পরিমাণ</label>
+                    <input id="purQty" type="number" min="1" value="1" class="sr-input rounded-xl px-3 py-2 w-full" required />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-[var(--text-muted)] mb-1">দর (৳)</label>
+                    <input id="purCost" type="number" min="0" value="0" class="sr-input rounded-xl px-3 py-2 w-full" required />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-[var(--text-muted)] mb-1">পরিশোধ (৳)</label>
+                    <input id="purPaid" type="number" min="0" value="0" class="sr-input rounded-xl px-3 py-2 w-full" required />
+                  </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold">ক্রয় ও স্টক যোগ করুন</button>
+              </form>
+              <div class="pt-2 border-t border-[var(--border-color)]">
+                <h4 class="text-xs font-bold text-[var(--text-muted)] mb-2">সাম্প্রতিক ক্রয় তালিকা</h4>
+                <div id="purchasesList" class="space-y-1.5 max-h-48 overflow-y-auto text-xs"></div>
+              </div>
+            </div>
+
+            <!-- Add Expense -->
+            <div class="sr-card rounded-2xl p-4 space-y-3">
+              <h3 class="text-base font-extrabold text-amber-400">💸 নতুন ব্যয় যোগ করুন (Expense)</h3>
+              <form id="expenseForm" class="space-y-3 text-sm">
+                <div>
+                  <label class="block text-xs text-[var(--text-muted)] mb-1">ব্যয়ের খাত / বিবরণ</label>
+                  <input id="expTitle" type="text" class="sr-input rounded-xl px-3 py-2 w-full" placeholder="যেমন: দোকান ভাড়া, বিদ্যুৎ বিল, স্টাফ বেতন" required />
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-xs text-[var(--text-muted)] mb-1">ক্যাটাগরি</label>
+                    <select id="expCategory" class="sr-input rounded-xl px-3 py-2 w-full">
+                      <option value="ভাড়া ও ইউটিলিটি">ভাড়া ও ইউটিলিটি</option>
+                      <option value="বেতন">বেতন</option>
+                      <option value="পরিবহন">পরিবহন</option>
+                      <option value="অন্যান্য">অন্যান্য</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs text-[var(--text-muted)] mb-1">পরিমাণ (৳)</label>
+                    <input id="expAmount" type="number" min="1" value="500" class="sr-input rounded-xl px-3 py-2 w-full" required />
+                  </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl sr-gold-gradient text-slate-950 font-bold">ব্যয় সেভ করুন</button>
+              </form>
+              <div class="pt-2 border-t border-[var(--border-color)]">
+                <h4 class="text-xs font-bold text-[var(--text-muted)] mb-2">সাম্প্রতিক ব্যয়সমূহ</h4>
+                <div id="expensesList" class="space-y-1.5 max-h-48 overflow-y-auto text-xs"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. CONTACTS (CUSTOMERS & SUPPLIERS) -->
+        <section id="view-contacts" class="view-section hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-extrabold">👥 গ্রাহক ও সরবরাহকারী</h2>
+              <p class="text-xs text-[var(--text-muted)]">গ্রাহকের বাকি আদায় এবং সরবরাহকারীর বকেয়া পরিশোধ</p>
+            </div>
+            <button id="openAddContactBtn" type="button" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-bold">+ নতুন কন্টাক্ট</button>
+          </div>
+          <div class="sr-card rounded-2xl p-4 space-y-3">
+            <div class="flex gap-2">
+              <button type="button" data-ctype="customer" class="contact-filter-btn px-3 py-1.5 rounded-lg bg-cyan-600 text-white text-xs font-bold">গ্রাহক (Customers)</button>
+              <button type="button" data-ctype="supplier" class="contact-filter-btn px-3 py-1.5 rounded-lg sr-input text-xs font-bold">সরবরাহকারী (Suppliers)</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs sm:text-sm text-left">
+                <thead>
+                  <tr class="border-b border-[var(--border-color)] text-[var(--text-muted)]">
+                    <th class="py-2 px-2">নাম</th>
+                    <th class="py-2 px-2">মোবাইল</th>
+                    <th class="py-2 px-2">ঠিকানা</th>
+                    <th class="py-2 px-2 text-right">বকেয়া (Due)</th>
+                    <th class="py-2 px-2 text-right">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="contactsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6.5. COMPANY SETTLEMENT & LEDGER -->
+        <section id="view-settlements" class="view-section hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-extrabold">🏢 কোম্পানি সেটেলমেন্ট ও লেজার (Company Accounts)</h2>
+              <p class="text-xs text-[var(--text-muted)]">Minister, MyOne, Butterfly Marketing Limited ও SR Electronics Park-এর হিসাব নিষ্পত্তি ও ডেটা প্যাকেজ</p>
+            </div>
+            <button id="openLedgerModalBtn" type="button" class="px-4 py-2 rounded-xl sr-gold-gradient text-slate-950 text-xs sm:text-sm font-extrabold">+ লেজার এন্ট্রি যোগ করুন</button>
+          </div>
+
+          <div id="settlementCompanyCards" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+          <div class="sr-card rounded-2xl p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-sm font-extrabold text-cyan-400">📒 সেটেলমেন্ট লেজার লেনদেন (Ledger History)</h3>
+              <select id="ledgerCompanyFilter" class="sr-input rounded-xl px-3 py-1.5 text-xs font-semibold">
+                <option value="all">সব কোম্পানি</option>
+                <option value="minister">Minister</option>
+                <option value="myone">MyOne</option>
+                <option value="butterfly">Butterfly Marketing Limited</option>
+                <option value="sr">SR Electronics Park</option>
+              </select>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs sm:text-sm text-left">
+                <thead>
+                  <tr class="border-b border-[var(--border-color)] text-[var(--text-muted)]">
+                    <th class="py-2 px-2">তারিখ</th>
+                    <th class="py-2 px-2">কোম্পানি</th>
+                    <th class="py-2 px-2">ধরণ</th>
+                    <th class="py-2 px-2">রেফারেন্স / নোট</th>
+                    <th class="py-2 px-2 text-right">পরিমাণ (৳)</th>
+                    <th class="py-2 px-2 text-right">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="settlementLedgerBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. REPORTS & SOVEREIGN DATA BACKUP -->
+        <section id="view-reports" class="view-section hidden space-y-4">
+          <div class="sr-card rounded-2xl p-4 sm:p-5 space-y-3 border-l-4 border-l-amber-400">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="text-lg font-extrabold">🧾 ইনভয়েস সেটিংস ও লেআউট (Invoice Layouts)</h2>
+                <p class="text-xs text-[var(--text-muted)]">Salsabilah Amin Limited-এর ব্র্যান্ড অনুযায়ী প্রিন্ট লেআউট নির্বাচন করুন</p>
+              </div>
+              <button id="addInvoiceLayoutBtn" type="button" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold">+ যোগ করুন</button>
+            </div>
+            <div id="invoiceLayoutsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+          </div>
+          <div class="sr-card rounded-2xl p-4 sm:p-5 space-y-4">
+            <h2 class="text-lg font-extrabold">📊 লাভ-ক্ষতি সারসংক্ষেপ (Profit & Loss)</h2>
+            <div id="pnlSummaryGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+          </div>
+
+          <div class="sr-card rounded-2xl p-4 sm:p-5 space-y-4 border-l-4 border-l-cyan-400">
+            <div>
+              <h2 class="text-lg font-extrabold text-cyan-400">🛡️ নিজস্ব ডেটা ব্যাকআপ ও নিরাপত্তা নিয়ন্ত্রণ</h2>
+              <p class="text-xs sm:text-sm text-[var(--text-muted)]">আপনার সব হিসাব-নিকাশ শুধু আপনার ব্রাউজারেই সংরক্ষিত। কোনো থার্ড-পার্টি সার্ভারে ডেটা পাঠানো হয় না।</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <button id="exportFullJsonBtn" type="button" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-bold">⬇️ সম্পূর্ণ ব্যাকআপ (JSON)</button>
+              <label class="px-4 py-2.5 rounded-xl sr-input text-xs sm:text-sm font-bold cursor-pointer hover:border-amber-400">
+                ⬆️ ব্যাকআপ রিস্টোর (JSON)
+                <input id="importFullJsonInput" type="file" accept=".json" class="hidden" />
+              </label>
+              <button id="resetDemoDataBtn" type="button" class="px-4 py-2.5 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs sm:text-sm font-bold">🔄 ডেমো ডেটা রিসেট</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="sr-panel px-4 py-3 text-center text-xs text-[var(--text-muted)] flex flex-wrap items-center justify-center gap-2">
+        <span><strong class="text-[var(--text-main)]">SR Electronics Park</strong> — An Enterprise of Salsabilah Amin Limited</span>
+        <span>•</span>
+        <span class="text-cyan-400 font-bold">Powered by Gemini</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- MODAL: Add/Edit Product -->
+  <div id="productModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+    <div class="sr-panel rounded-2xl w-full max-w-lg p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 id="productModalTitle" class="text-base font-extrabold">নতুন পণ্য যোগ করুন</h3>
+        <button type="button" data-close-modal="productModal" class="text-[var(--text-muted)] hover:text-white">✕</button>
+      </div>
+      <form id="productForm" class="space-y-3 text-sm">
+        <input type="hidden" id="prodEditId" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">পণ্যের নাম *</label><input id="prodName" type="text" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">SKU / বারকোড *</label><input id="prodSku" type="text" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">ক্যাটাগরি</label><input id="prodCat" type="text" class="sr-input rounded-xl px-3 py-2 w-full" value="ইলেকট্রনিক্স" required /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">ওয়ারেন্টি</label><input id="prodWarranty" type="text" class="sr-input rounded-xl px-3 py-2 w-full" value="1 Year Official" /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">ক্রয়মূল্য (৳) *</label><input id="prodCost" type="number" min="0" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">বিক্রয়মূল্য (৳) *</label><input id="prodPrice" type="number" min="0" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">বর্তমান স্টক *</label><input id="prodStock" type="number" min="0" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+          <div><label class="block text-xs text-[var(--text-muted)] mb-1">অ্যালার্ট স্টক</label><input id="prodAlert" type="number" min="0" class="sr-input rounded-xl px-3 py-2 w-full" value="3" /></div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal="productModal" class="px-4 py-2 rounded-xl sr-input text-xs font-bold">বাতিল</button>
+          <button type="submit" class="px-4 py-2 rounded-xl sr-gold-gradient text-slate-950 text-xs font-extrabold">সংরক্ষণ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Add Contact -->
+  <div id="contactModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+    <div class="sr-panel rounded-2xl w-full max-w-md p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold">নতুন গ্রাহক / সরবরাহকারী</h3>
+        <button type="button" data-close-modal="contactModal" class="text-[var(--text-muted)]">✕</button>
+      </div>
+      <form id="contactForm" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs text-[var(--text-muted)] mb-1">ধরণ</label>
+          <select id="conType" class="sr-input rounded-xl px-3 py-2 w-full">
+            <option value="customer">গ্রাহক (Customer)</option>
+            <option value="supplier">সরবরাহকারী (Supplier)</option>
+          </select>
+        </div>
+        <div><label class="block text-xs text-[var(--text-muted)] mb-1">নাম *</label><input id="conName" type="text" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+        <div><label class="block text-xs text-[var(--text-muted)] mb-1">মোবাইল নম্বর *</label><input id="conPhone" type="text" class="sr-input rounded-xl px-3 py-2 w-full" required /></div>
+        <div><label class="block text-xs text-[var(--text-muted)] mb-1">ঠিকানা</label><input id="conAddr" type="text" class="sr-input rounded-xl px-3 py-2 w-full" /></div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal="contactModal" class="px-4 py-2 rounded-xl sr-input text-xs font-bold">বাতিল</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-xs font-bold">যোগ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Invoice / Print Receipt -->
+  <div id="receiptModal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+    <div class="sr-panel rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between gap-2">
+        <h3 class="text-base font-extrabold">🧾 ইনভয়েস রসিদ</h3>
+        <select id="receiptLayoutSwitcher" class="sr-input rounded-lg px-2 py-1 text-xs font-semibold"></select>
+        <button type="button" data-close-modal="receiptModal" class="text-[var(--text-muted)]">✕</button>
+      </div>
+      <div id="receiptPrintArea" class="bg-white text-slate-900 rounded-xl p-4 text-xs space-y-2"></div>
+      <div class="flex justify-end gap-2">
+        <button type="button" data-close-modal="receiptModal" class="px-4 py-2 rounded-xl sr-input text-xs font-bold">বন্ধ করুন</button>
+        <button id="printReceiptBtn" type="button" class="px-4 py-2 rounded-xl sr-gold-gradient text-slate-950 text-xs font-extrabold">🖨️ প্রিন্ট করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Calculator -->
+  <div id="calcModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+    <div class="sr-panel rounded-2xl w-full max-w-xs p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-extrabold">🧮 ক্যালকুলেটর</h3>
+        <button type="button" data-close-modal="calcModal" class="text-[var(--text-muted)]">✕</button>
+      </div>
+      <input id="calcDisplay" type="text" readonly class="sr-input rounded-xl px-3 py-3 w-full text-right text-xl font-extrabold" value="0" />
+      <div id="calcKeys" class="grid grid-cols-4 gap-2 text-sm font-bold">
+        <button type="button" data-key="C" class="p-3 rounded-xl bg-rose-500/20 text-rose-400">AC</button>
+        <button type="button" data-key="DEL" class="p-3 rounded-xl bg-amber-500/20 text-amber-300">CE</button>
+        <button type="button" data-key="/" class="p-3 rounded-xl sr-input">÷</button>
+        <button type="button" data-key="*" class="p-3 rounded-xl sr-input">×</button>
+        <button type="button" data-key="7" class="p-3 rounded-xl sr-input">7</button>
+        <button type="button" data-key="8" class="p-3 rounded-xl sr-input">8</button>
+        <button type="button" data-key="9" class="p-3 rounded-xl sr-input">9</button>
+        <button type="button" data-key="-" class="p-3 rounded-xl sr-input">-</button>
+        <button type="button" data-key="4" class="p-3 rounded-xl sr-input">4</button>
+        <button type="button" data-key="5" class="p-3 rounded-xl sr-input">5</button>
+        <button type="button" data-key="6" class="p-3 rounded-xl sr-input">6</button>
+        <button type="button" data-key="+" class="p-3 rounded-xl sr-input">+</button>
+        <button type="button" data-key="1" class="p-3 rounded-xl sr-input">1</button>
+        <button type="button" data-key="2" class="p-3 rounded-xl sr-input">2</button>
+        <button type="button" data-key="3" class="p-3 rounded-xl sr-input">3</button>
+        <button type="button" data-key="=" class="row-span-2 p-3 rounded-xl bg-cyan-600 text-white">=</button>
+        <button type="button" data-key="0" class="col-span-2 p-3 rounded-xl sr-input">0</button>
+        <button type="button" data-key="." class="p-3 rounded-xl sr-input">.</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirmation Dialog -->
+  <div id="confirmModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+    <div class="sr-panel rounded-2xl w-full max-w-sm p-5 space-y-4">
+      <h3 id="confirmTitle" class="text-base font-extrabold">নিশ্চিত করুন</h3>
+      <p id="confirmMessage" class="text-sm text-[var(--text-muted)]"></p>
+      <div class="flex justify-end gap-2">
+        <button type="button" data-close-modal="confirmModal" class="px-4 py-2 rounded-xl sr-input text-xs font-bold">না</button>
+        <button id="confirmYesBtn" type="button" class="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold">হ্যাঁ, নিশ্চিত</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Update Company Ledger -->
+  <div id="ledgerModal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+    <div class="sr-panel rounded-2xl w-full max-w-md p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold">📒 কোম্পানি লেজার আপডেট করুন</h3>
+        <button type="button" data-close-modal="ledgerModal" class="text-[var(--text-muted)]">✕</button>
+      </div>
+      <form id="ledgerForm" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs text-[var(--text-muted)] mb-1">কোম্পানি</label>
+          <select id="ledCompany" class="sr-input rounded-xl px-3 py-2 w-full">
+            <option value="minister">Minister (Minister Hi-Tech Park)</option>
+            <option value="myone">MyOne (MyOne Electronics)</option>
+            <option value="butterfly">Butterfly Marketing Limited</option>
+            <option value="sr">SR Electronics Park</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs text-[var(--text-muted)] mb-1">লেনদেনের ধরণ</label>
+            <select id="ledType" class="sr-input rounded-xl px-3 py-2 w-full">
+              <option value="payment">পরিশোধ (Payment)</option>
+              <option value="adjustment">ক্যাশব্যাক / সমন্বয়</option>
+              <option value="debit">নতুন বিল / ডেবিট (+)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--text-muted)] mb-1">তারিখ</label>
+            <input id="ledDate" type="date" class="sr-input rounded-xl px-3 py-2 w-full" required />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs text-[var(--text-muted)] mb-1">পরিমাণ (৳) *</label>
+            <input id="ledAmount" type="number" min="1" step="0.01" class="sr-input rounded-xl px-3 py-2 w-full" required />
+          </div>
+          <div>
+            <label class="block text-xs text-[var(--text-muted)] mb-1">রেফারেন্স নং</label>
+            <input id="ledRef" type="text" class="sr-input rounded-xl px-3 py-2 w-full" placeholder="ব্যাংক / চেক / রসিদ নং" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-[var(--text-muted)] mb-1">নোট / বিবরণ</label>
+          <input id="ledNote" type="text" class="sr-input rounded-xl px-3 py-2 w-full" placeholder="হিসাব নিষ্পত্তি সংক্রান্ত মন্তব্য" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal="ledgerModal" class="px-4 py-2 rounded-xl sr-input text-xs font-bold">বাতিল</button>
+          <button type="submit" class="px-4 py-2 rounded-xl sr-gold-gradient text-slate-950 text-xs font-extrabold">লেজার সেভ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastBox" class="fixed bottom-4 right-4 z-[60] space-y-2 max-w-xs"></div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'sr_electronics_sovereign_pos_v2';
+
+      const DEFAULT_STATE = {"lang": "bn", "theme": "dark", "brands": ["BRB", "BUTTERFLY", "CHINA", "CHINA STEEL", "ECO+", "GAZI", "HAIER", "HAMKO", "HISENSE", "HITACHI", "Howkingss", "Hyundai", "Karoake", "KIAM", "LG", "Midea", "minister", "MyOne", "Nova", "Prestridge", "RFL", "SAMSUNG", "Sharif", "SR Electronics Park Limited", "TOSHIBA", "Vision", "WHIRLPOOL"], "customerGroups": ["⚠️❌💸🚨🕰️👑🥇📈👑🗓️⏳", "Fraud Customer", "Home Appliance Due Sale", "SUMON VAI EXCLUSIVE", "💸 Cash Buyer", "👑 Gold Loyalty Club", "🥇Business-to-Business", "📈Customer on EMI", "📈Customer on EMI- NOVEMBER", "📈Customer on EMI--AUGUST", "📈Customer on EMI--DECEMBER", "📈Customer on EMI--OCTOBER", "📈Customer on EMI--SEPTEMBER", "🗓️One term Due"], "warranties": [{"name": "নাম", "desc": "বর্ণনা", "duration": "অবধি"}, {"name": "Air Conditioner", "desc": "Minister", "duration": "7 বছর"}, {"name": "ECO+", "desc": "Refrigerator", "duration": "10 বছর"}, {"name": "ELECTRIC KETTLE", "desc": "MINISTER", "duration": "12 মাস"}, {"name": "FAN", "desc": "MyOne", "duration": "7 বছর"}, {"name": "Gas Stove", "desc": "Sharif", "duration": "10 বছর"}, {"name": "Gas Stove", "desc": "Gazi", "duration": "1 বছর"}, {"name": "GEYSER", "desc": "ECO+", "duration": "5 বছর"}, {"name": "IRON", "desc": "MINISTER", "duration": "12 মাস"}, {"name": "LED TV", "desc": "Minister M-24 INTERNET GLORIOUS", "duration": "10 বছর"}, {"name": "LED TV", "desc": "MI32M9HGTV", "duration": "7 বছর"}, {"name": "LED TV", "desc": "MI32M8CGV", "duration": "10 বছর"}, {"name": "LED TV", "desc": "MI32M9HGTV", "duration": "7 বছর"}, {"name": "LED TV", "desc": "Minister", "duration": "10 বছর"}, {"name": "MINISTER 32 INCH MI32M4SAB TANDID SMART ANDROID LED TV", "desc": "", "duration": "5 বছর"}, {"name": "Mixer Grinder", "desc": "Minister", "duration": "12 মাস"}, {"name": "Mixer Grinder", "desc": "Minister", "duration": "12 মাস"}, {"name": "Pressure Cooker", "desc": "Sharif", "duration": "10 বছর"}, {"name": "Refrigerator", "desc": "Minister", "duration": "12 বছর"}, {"name": "Regulator", "desc": "Sharif", "duration": "5 বছর"}, {"name": "Rice Cooker", "desc": "Minister", "duration": "12 মাস"}, {"name": "Rice Cooker", "desc": "Others", "duration": "12 মাস"}, {"name": "Washing Machine", "desc": "MINISTER", "duration": "5 বছর"}, {"name": "WASHING MACHINE", "desc": "MINISTER", "duration": "5 বছর"}], "products": [{"id": "p1", "sku": "IVT-M18K410WCP-WHT", "name": "INV-M18K410WCP-WHT", "category": "AIR CONDITION", "brand": "minister", "warranty": "Official Warranty", "cost": 63292.0, "price": 87086.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p2", "sku": "MIAC2TON", "name": "Minister 2 TON NON INVERTER (24K410P-WHT)", "category": "Air Conditioner", "brand": "minister", "warranty": "7 বছর (Minister)", "cost": 71192.0, "price": 98914.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p3", "sku": "MIAC1T", "name": "Minister 1 TON NON INVERTER (12K410P-WHT)", "category": "Air Conditioner", "brand": "minister", "warranty": "7 বছর (Minister)", "cost": 37742.0, "price": 54828.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p4", "sku": "Minister SPLIT 1.5 TON INVERTER (INV-M18K410G-WHT)", "name": "MI-AC-INVERTER-1.5", "category": "Air Conditioner", "brand": "minister", "warranty": "7 বছর (Minister)", "cost": 60066.0, "price": 87086.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p5", "sku": "MIAC1.5", "name": "Minister 1.5 TON NON INVERTER (MI18k410P-WHT)", "category": "Air Conditioner", "brand": "minister", "warranty": "7 বছর (Minister)", "cost": 60066.0, "price": 72032.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p6", "sku": "MI-BLENDER-3G", "name": "minister BLENDER", "category": "BLENDER", "brand": "minister", "warranty": "Official Warranty", "cost": 2000.0, "price": 2450.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p7", "sku": "NOVAMCD999", "name": "Nova Blender", "category": "Blender", "brand": "Nova", "warranty": "Official Warranty", "cost": 1050.0, "price": 1500.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p8", "sku": "PRG-BLD-999P", "name": "Prestiege Blender", "category": "Blender", "brand": "Prestridge", "warranty": "Official Warranty", "cost": 1050.0, "price": 1500.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p9", "sku": "LB6002W", "name": "LB6002W", "category": "Blender", "brand": "minister", "warranty": "Official Warranty", "cost": 1950.0, "price": 2250.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p10", "sku": "VISION RECHAGER-14", "name": "Vision 14 Inchi", "category": "Charger Fan", "brand": "Vision", "warranty": "Official Warranty", "cost": 4400.0, "price": 4800.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p11", "sku": "VISION RECHAGER-12", "name": "Vision 12 Inchi", "category": "Charger Fan", "brand": "Vision", "warranty": "Official Warranty", "cost": 4000.0, "price": 4500.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p12", "sku": "SHEK1.8", "name": "Sharif EK 1.8", "category": "ELECTRIC KETTLE", "brand": "Sharif", "warranty": "12 মাস (MINISTER)", "cost": 1105.0, "price": 1600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p13", "sku": "MI-EKX18 1.8 L SILVER BLACK", "name": "MI-EKX1.8 SILVER", "category": "ELECTRIC KETTLE", "brand": "minister", "warranty": "12 মাস (MINISTER)", "cost": 660.0, "price": 1280.0, "stock": -1.0, "alertQty": 2, "inactive": true}, {"id": "p14", "sku": "MY--EK1.8", "name": "Myone Electric Kettle", "category": "ELECTRIC KETTLE", "brand": "MyOne", "warranty": "12 মাস (MINISTER)", "cost": 790.0, "price": 1495.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p15", "sku": "MI-EKX 180 BLACK", "name": "Minister EKX180B", "category": "ELECTRIC KETTLE", "brand": "minister", "warranty": "12 মাস (MINISTER)", "cost": 660.0, "price": 1074.0, "stock": 48.0, "alertQty": 2, "inactive": false}, {"id": "p16", "sku": "MYF56", "name": "Myone Celling Fan 56\"", "category": "Fan", "brand": "MyOne", "warranty": "7 বছর (MyOne)", "cost": 3490.0, "price": 3650.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p17", "sku": "BRB_LOVELY_56", "name": "BRB_LOVELY_56_FAN", "category": "FAN", "brand": "BRB", "warranty": "7 বছর (MyOne)", "cost": 3500.0, "price": 4090.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p18", "sku": "Winner Vacuum- 1000", "name": "Winner Vacuam Flask", "category": "Flask", "brand": "RFL", "warranty": "Official Warranty", "cost": 350.0, "price": 450.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p19", "sku": "SHVCF1L", "name": "Sharif VF Crown 1000", "category": "Flask", "brand": "Sharif", "warranty": "Official Warranty", "cost": 330.0, "price": 445.0, "stock": 12.0, "alertQty": 2, "inactive": false}, {"id": "p20", "sku": "SHVCF500", "name": "Sharif VF Crown 500", "category": "Flask", "brand": "Sharif", "warranty": "Official Warranty", "cost": 230.0, "price": 330.0, "stock": 9.0, "alertQty": 2, "inactive": false}, {"id": "p21", "sku": "432352", "name": "Winner Angel Flask 1L", "category": "Flask", "brand": "RFL", "warranty": "Official Warranty", "cost": 590.0, "price": 710.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p22", "sku": "FCSS1100", "name": "Rectangle Stainless Steel 1100 ML", "category": "Food Container", "brand": "CHINA STEEL", "warranty": "Official Warranty", "cost": 330.0, "price": 440.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p23", "sku": "432380", "name": "Rectangle Stainless Steel 680ML", "category": "Food Container", "brand": "CHINA STEEL", "warranty": "Official Warranty", "cost": 290.0, "price": 400.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p24", "sku": "ECO+ BD-249SG Green", "name": "ECO+BD-249 SG GREEN", "category": "FREEZER", "brand": "ECO+", "warranty": "Official Warranty", "cost": 36361.0, "price": 41800.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p25", "sku": "ECO+ 198 LITER GLASS DOOR FREEZER", "name": "ECO+BD-198 FREEZER SG SKY BLUE", "category": "FREEZER", "brand": "ECO+", "warranty": "Official Warranty", "cost": 35221.0, "price": 40500.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p26", "sku": "ECO198DEEPCHAM", "name": "ECO+BD-198 FREEZER CHAMPAIGN", "category": "Freezer", "brand": "ECO+", "warranty": "Official Warranty", "cost": 30529.0, "price": 36350.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p27", "sku": "Stand for Fridge", "name": "ECO+ Fridge Stand", "category": "Fridge Stand", "brand": "ECO+", "warranty": "Official Warranty", "cost": 200.0, "price": 1000.0, "stock": 4.0, "alertQty": 2, "inactive": false}, {"id": "p28", "sku": "Gas01", "name": "LPG GAS", "category": "Gas", "brand": "CHINA", "warranty": "Official Warranty", "cost": 1160.0, "price": 1360.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p29", "sku": "LiraGP", "name": "Gas Pipe", "category": "Gas Pipe", "brand": "GAZI", "warranty": "Official Warranty", "cost": 38.3, "price": 100.0, "stock": -0.5, "alertQty": 2, "inactive": false}, {"id": "p30", "sku": "GAS BOTTLE", "name": "Gas Silinder", "category": "Gas Silinder", "brand": "Sharif", "warranty": "Official Warranty", "cost": 860.0, "price": 1000.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p31", "sku": "RFL102SSR", "name": "RFL 1-02 SRB", "category": "Gas Stove", "brand": "RFL", "warranty": "10 বছর (Sharif)", "cost": 1615.0, "price": 2018.75, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p32", "sku": "SHGS2066S", "name": "Sharif GS 2066(S)", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2349.0, "price": 2900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p33", "sku": "SHGSS2070", "name": "Sharif GS 2070(S)", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2408.0, "price": 3390.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p34", "sku": "SH-GSG-686S", "name": "SH-GSG686S", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2250.0, "price": 3250.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p35", "sku": "HB001", "name": "Hotel Burner", "category": "Gas Stove", "brand": "CHINA", "warranty": "10 বছর (Sharif)", "cost": 2480.0, "price": 3350.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p36", "sku": "SHGS680D02", "name": "Sharif Gas Stove 680D", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 3523.5, "price": 4990.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p37", "sku": "SHGS642D", "name": "Sharif GS 642(D)", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 4212.0, "price": 5900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p38", "sku": "SHAGS682D", "name": "Sharif GS 682D", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 3442.5, "price": 4250.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p39", "sku": "GGS110S", "name": "Gazi GST 110", "category": "Gas Stove", "brand": "GAZI", "warranty": "10 বছর (Sharif)", "cost": 2295.0, "price": 3000.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p40", "sku": "SHGS684D", "name": "Sharif Gas Stove 684D", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 3888.0, "price": 4800.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p41", "sku": "SHGS680D", "name": "Sharif GS 680(D)", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 3523.5, "price": 4350.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p42", "sku": "SHAGS2067S", "name": "Sharif GS 2067(S)", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1944.0, "price": 2430.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p43", "sku": "GGS117C", "name": "Gazi GST 117C", "category": "Gas Stove", "brand": "GAZI", "warranty": "10 বছর (Sharif)", "cost": 2295.0, "price": 3200.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p44", "sku": "SHA-GS-630S", "name": "Sharif Gas Stove 630S", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1763.0, "price": 2250.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p45", "sku": "SHA-GS-SS-627D", "name": "Sharif Gas Stove 627D", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2624.0, "price": 3763.2, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p46", "sku": "SHA-GS-610D", "name": "SHARIF-GS-610D", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 4600.0, "price": 6050.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p47", "sku": "SHGS670D", "name": "Sharif GS 670(D)", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 3784.0, "price": 4800.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p48", "sku": "KIGS2050D", "name": "Kiam Gas Stove 2050(D)", "category": "Gas Stove", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 2520.0, "price": 3085.74, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p49", "sku": "GGS3651A-R", "name": "Gazi HTG 3651A-R", "category": "Gas Stove", "brand": "GAZI", "warranty": "10 বছর (Sharif)", "cost": 1918.35, "price": 2600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p50", "sku": "Sharif Gas Stove-SS-688D", "name": "Sharif Gas Stove", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2200.0, "price": 3760.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p51", "sku": "GGS102C", "name": "Gazi Gas Stove 102C", "category": "Gas Stove", "brand": "GAZI", "warranty": "10 বছর (Sharif)", "cost": 1850.0, "price": 2250.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p52", "sku": "SHA-645-SINGLE", "name": "SHARIF GAS STOVE 645", "category": "GAS STOVE", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1742.0, "price": 2250.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p53", "sku": "SHGS2069S", "name": "Sharif Gas Stove 2069S", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2349.0, "price": 3300.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p54", "sku": "SHA-GS-665-D", "name": "Sharif Gas Stove", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 3528.0, "price": 5500.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p55", "sku": "GGS2888A", "name": "Gazi HTG 2888A", "category": "Gas Stove", "brand": "GAZI", "warranty": "10 বছর (Sharif)", "cost": 3780.0, "price": 4600.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p56", "sku": "GAS STOVE--660D", "name": "Sharif Gas Stove--660D", "category": "Gas Stove", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 2975.0, "price": 4200.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p57", "sku": "437170", "name": "Gas Stove Regulator", "category": "Gas Stove Regulator", "brand": "Sharif", "warranty": "Official Warranty", "cost": 400.0, "price": 500.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p58", "sku": "GSR298", "name": "Gas Stove Regulator", "category": "Gas Stove Regulator", "brand": "GAZI", "warranty": "Official Warranty", "cost": 500.0, "price": 975.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p59", "sku": "SGSR", "name": "Gas Stove Regulator", "category": "Gas Stove Regulator", "brand": "GAZI", "warranty": "Official Warranty", "cost": 240.0, "price": 425.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p60", "sku": "433672", "name": "Midea 30L", "category": "Geyser", "brand": "Midea", "warranty": "5 বছর (ECO+)", "cost": 10500.0, "price": 14500.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p61", "sku": "ECO+ECWH-D30H", "name": "ECO+30 LITER", "category": "GEYSER", "brand": "ECO+", "warranty": "5 বছর (ECO+)", "cost": 10589.0, "price": 15201.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p62", "sku": "ECO+ECWH-D40H", "name": "ECO+40 LITER", "category": "GEYSER", "brand": "ECO+", "warranty": "5 বছর (ECO+)", "cost": 11745.0, "price": 16038.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p63", "sku": "SHHP1000", "name": "Sharif HP 1000", "category": "Hotpot", "brand": "Sharif", "warranty": "Official Warranty", "cost": 245.0, "price": 400.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p64", "sku": "SHHP1700", "name": "Sharif HP 1700", "category": "Hotpot", "brand": "Sharif", "warranty": "Official Warranty", "cost": 800.0, "price": 1200.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p65", "sku": "MI-HCG", "name": "Minister HC Gift", "category": "Human Care Gift Box", "brand": "minister", "warranty": "Official Warranty", "cost": 1.0, "price": 500.0, "stock": 105.0, "alertQty": 2, "inactive": true}, {"id": "p66", "sku": "SH-IC-516C", "name": "SHA-IC--516C", "category": "Induction", "brand": "Sharif", "warranty": "Official Warranty", "cost": 3400.0, "price": 4900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p67", "sku": "A-15M  INVERTER", "name": "GAZI--A-15M MARBLE", "category": "Induction", "brand": "GAZI", "warranty": "Official Warranty", "cost": 4000.0, "price": 4950.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p68", "sku": "Gazi  A-12R", "name": "GAZI--A-12R MARBLE", "category": "Induction", "brand": "GAZI", "warranty": "Official Warranty", "cost": 4000.0, "price": 4950.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p69", "sku": "Hamko-25A (HEC-1-03)", "name": "HAMKO-HEC1-03", "category": "Induction", "brand": "HAMKO", "warranty": "Official Warranty", "cost": 3850.0, "price": 5050.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p70", "sku": "SH-IC-516A", "name": "SHA-IC516A", "category": "Induction", "brand": "Sharif", "warranty": "Official Warranty", "cost": 3400.0, "price": 4900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p71", "sku": "DT213", "name": "Gazi-Infra-DT213", "category": "Infrared", "brand": "GAZI", "warranty": "Official Warranty", "cost": 3219.0, "price": 5050.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p72", "sku": "GAZI-A35G", "name": "Gazi Infrared", "category": "Infrared", "brand": "GAZI", "warranty": "Official Warranty", "cost": 4300.0, "price": 5000.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p73", "sku": "HEC-2-01", "name": "Infrared- HEC-2-01", "category": "Infrared", "brand": "HAMKO", "warranty": "Official Warranty", "cost": 3414.4, "price": 5050.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p74", "sku": "Kiam_Infrared_ H-11", "name": "Kiam Infrared", "category": "Infrared Cooker", "brand": "KIAM", "warranty": "Official Warranty", "cost": 3240.0, "price": 4850.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p75", "sku": "2-01 Hamko Infrared", "name": "HAMKO Infrared Cooker", "category": "Infrared Cooker", "brand": "HAMKO", "warranty": "Official Warranty", "cost": 3414.0, "price": 5050.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p76", "sku": "MIDI631", "name": "Minister Dry Iron 631", "category": "Iron", "brand": "minister", "warranty": "12 মাস (MINISTER)", "cost": 1250.0, "price": 1734.0, "stock": 21.0, "alertQty": 2, "inactive": false}, {"id": "p77", "sku": "YPE-632L", "name": "Minister Dry Iron 632", "category": "Iron", "brand": "minister", "warranty": "12 মাস (MINISTER)", "cost": 1550.0, "price": 1950.0, "stock": 15.0, "alertQty": 2, "inactive": false}, {"id": "p78", "sku": "SHDI1401", "name": "Sharif Iron", "category": "Iron", "brand": "Sharif", "warranty": "12 মাস (MINISTER)", "cost": 826.5, "price": 1200.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p79", "sku": "MI32JF2SAV", "name": "MI32JF2SAV", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 20400.0, "price": 28925.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p80", "sku": "MI32K60SAB", "name": "MI32K60SAB", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 18900.0, "price": 26774.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p81", "sku": "ECO+ HD SMART 32T1", "name": "ECO+ HD SMART 32T1", "category": "LED TV", "brand": "ECO+", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 23401.0, "price": 26401.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p82", "sku": "MI43M8DGV", "name": "MI43M8DGV Glorious Voice Control", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 38423.0, "price": 53656.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p83", "sku": "BT QLED 55T1G", "name": "BUTTERFLY LED TV", "category": "LED TV", "brand": "BUTTERFLY", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 60487.0, "price": 68300.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p84", "sku": "MI24M7CG", "name": "MI24M7CG", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 13230.0, "price": 20323.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p85", "sku": "MI32M7CG", "name": "MI32M7CG", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 19809.0, "price": 30000.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p86", "sku": "MI43M9FHGTV", "name": "MI43M9FHGTV", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 25900.0, "price": 47204.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p87", "sku": "MI43QF35FVB", "name": "MI43Q35FVB", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 30900.0, "price": 49355.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p88", "sku": "MI32M8CGV", "name": "MI32M8CGV", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 30900.0, "price": 32151.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p89", "sku": "MI43M9LFHGTV", "name": "MI43M9LFHGTV", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 24900.0, "price": 49355.0, "stock": -1.0, "alertQty": 2, "inactive": true}, {"id": "p90", "sku": "Minister 65 Inch QLED Google TV MI65GTVN9Z4KQLED", "name": "MI65GTVN9Z4KQLED", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 83083.0, "price": 107419.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p91", "sku": "MINISTER 55 INCH 4K QLED GOOGLE TV (MI55GTVN9E4KQLED", "name": "Minister 55 Inch MI55GTVN9E4KQLED Google TV", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 66143.0, "price": 92366.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p92", "sku": "MI32M4SAB", "name": "MI-32M4SAB", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 17925.0, "price": 25573.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p93", "sku": "MI32M9HGTV", "name": "MI32M9HGTV", "category": "LED TV", "brand": "minister", "warranty": "10 বছর (Minister M-24 INTERNET GLORIOUS)", "cost": 29900.0, "price": 33204.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p94", "sku": "CHINA-32-SONYPLUS", "name": "CHINA LED TV(CHINA)", "category": "LED TV(CHINA)", "brand": "CHINA", "warranty": "Official Warranty", "cost": 12000.0, "price": 16000.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p95", "sku": "1107154", "name": "CHINA LOCK", "category": "LOCK", "brand": "CHINA", "warranty": "Official Warranty", "cost": 4.0, "price": 10.0, "stock": -2.0, "alertQty": 2, "inactive": false}, {"id": "p96", "sku": "MI-25UX68 (GRIL 25L)", "name": "Microwave Oven", "category": "Microwave Oven", "brand": "minister", "warranty": "Official Warranty", "cost": 10912.2, "price": 15043.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p97", "sku": "MI-28UX41 (GRIL 28L)", "name": "Microwave Oven", "category": "Microwave Oven", "brand": "minister", "warranty": "Official Warranty", "cost": 16990.0, "price": 18269.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p98", "sku": "ECO+ MG30AYPE", "name": "ECO+ 30 LITER GRILL OVEN", "category": "Microwave Oven", "brand": "ECO+", "warranty": "Official Warranty", "cost": 14683.0, "price": 16500.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p99", "sku": "MI-MG600", "name": "MI-MG600", "category": "Mixer Grinder", "brand": "minister", "warranty": "12 মাস (Minister)", "cost": 4690.0, "price": 5366.0, "stock": 1.0, "alertQty": 2, "inactive": true}, {"id": "p100", "sku": "MI-MG800", "name": "MI-MG800RB", "category": "Mixer Grinder", "brand": "minister", "warranty": "12 মাস (Minister)", "cost": 5947.5, "price": 6559.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p101", "sku": "MP01", "name": "Mobile Phone", "category": "Mobile Phone", "brand": "Other", "warranty": "Official Warranty", "cost": 6000.0, "price": 6000.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p102", "sku": "MP0001", "name": "Mobile Phone", "category": "Mobile Phone", "brand": "CHINA", "warranty": "Official Warranty", "cost": 6000.0, "price": 6500.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p103", "sku": "MKB-VS-002", "name": "Mosquito Killing Bat", "category": "Mosquito Killing Bat", "brand": "Vision", "warranty": "Official Warranty", "cost": 430.0, "price": 520.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p104", "sku": "HAMKO-2IN1", "name": "HAMKO Multi Cooker", "category": "Multi Cooker", "brand": "HAMKO", "warranty": "Official Warranty", "cost": 2860.0, "price": 122980.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p105", "sku": "HAMKO-3IN1", "name": "HAMKO Multi Cooker", "category": "Multi Cooker", "brand": "HAMKO", "warranty": "Official Warranty", "cost": 3300.0, "price": 151800.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p106", "sku": "Marcel LED 32\"", "name": "Old Product", "category": "Old Product", "brand": "Other", "warranty": "Official Warranty", "cost": 2000.0, "price": 10000.0, "stock": 1.0, "alertQty": 2, "inactive": true}, {"id": "p107", "sku": "own01", "name": "Ownership", "category": "Ownership", "brand": "Other", "warranty": "Official Warranty", "cost": 2000000.0, "price": 2500000.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p108", "sku": "Panel--43", "name": "minister Panel Replacement", "category": "Panel Replacement", "brand": "minister", "warranty": "Official Warranty", "cost": 5.0, "price": 1950.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p109", "sku": "KIPC2.5", "name": "Kiam PC 2.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 933.75, "price": 1250.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p110", "sku": "HWPCS3.5", "name": "HOWKINGSS PC 3.5", "category": "Pressure Cooker", "brand": "Howkingss", "warranty": "10 বছর (Sharif)", "cost": 959.4, "price": 1450.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p111", "sku": "PC-PG-IP-5.5", "name": "Kiam PC-PG-IP-5.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 1430.0, "price": 1750.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p112", "sku": "KIPC3.5", "name": "Kiam PC PG 3.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 1045.5, "price": 1450.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p113", "sku": "SHPC4.5", "name": "Sharif PC 4.5", "category": "Pressure Cooker", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1189.0, "price": 1450.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p114", "sku": "Howking PC 4.5 O", "name": "HAMKO 4.5 OVAL", "category": "Pressure Cooker", "brand": "Howkingss", "warranty": "10 বছর (Sharif)", "cost": 1165.0, "price": 1464.0, "stock": 4.0, "alertQty": 2, "inactive": false}, {"id": "p115", "sku": "KIPCPG5.5", "name": "Kiam PC PG 5.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 1750.0, "price": 1600.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p116", "sku": "SHPC3", "name": "Sharif PC 3", "category": "Pressure Cooker", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1000.0, "price": 1300.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p117", "sku": "KIAM-PC-PG-3.5", "name": "Kiam PC PG 3.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 1400.0, "price": 1450.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p118", "sku": "HOW--3.5 O", "name": "HOWKINGSS 3.5 OVAL", "category": "Pressure Cooker", "brand": "Howkingss", "warranty": "10 বছর (Sharif)", "cost": 1091.0, "price": 1400.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p119", "sku": "SHPC5.5", "name": "Sharif PC 5.5", "category": "Pressure Cooker", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1246.4, "price": 1550.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p120", "sku": "HOW--4.5 O", "name": "HOWKINGSS PC 4.5 OVAL", "category": "Pressure Cooker", "brand": "Howkingss", "warranty": "10 বছর (Sharif)", "cost": 1165.0, "price": 1464.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p121", "sku": "KIPC10.5", "name": "Kiam PC 10.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 2091.0, "price": 2700.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p122", "sku": "SHPC6.5", "name": "Sharif PC 6.5", "category": "Pressure Cooker", "brand": "Sharif", "warranty": "10 বছর (Sharif)", "cost": 1300.0, "price": 1650.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p123", "sku": "KIPC1.5", "name": "Kiam PC 1.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 892.25, "price": 1150.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p124", "sku": "KIAM-PC-Q--3.5", "name": "Kiam PC Q 3.5", "category": "Pressure Cooker", "brand": "KIAM", "warranty": "10 বছর (Sharif)", "cost": 1275.0, "price": 1450.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p125", "sku": "HWPC5.5", "name": "HOWKINGSS PC 5.5", "category": "Pressure Cooker", "brand": "Howkingss", "warranty": "10 বছর (Sharif)", "cost": 1233.0, "price": 1550.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p126", "sku": "432381", "name": "Ashtray Small", "category": "Random", "brand": "CHINA", "warranty": "Official Warranty", "cost": 110.0, "price": 150.0, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p127", "sku": "MYRF14", "name": "Myone Rechargeable Fan 14 Inch", "category": "Rechargeable Fan", "brand": "MyOne", "warranty": "Official Warranty", "cost": 4190.0, "price": 5151.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p128", "sku": "MYRF12", "name": "Myone Rechargeable Fan 12 Inch", "category": "Rechargeable Fan", "brand": "MyOne", "warranty": "Official Warranty", "cost": 3290.0, "price": 4362.5, "stock": 3.0, "alertQty": 2, "inactive": false}, {"id": "p129", "sku": "M170DG", "name": "Minister-M 170G DEEP", "category": "Refrigarator", "brand": "minister", "warranty": "Official Warranty", "cost": 27250.3, "price": 38054.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p130", "sku": "ECO+BCD-202 JUMPING", "name": "ECO+BCD-202 FL GD BLACK JUMPING LINE", "category": "Refrigeraor", "brand": "ECO+", "warranty": "Official Warranty", "cost": 30131.0, "price": 42900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p131", "sku": "M-254 EL BLUE MARBLE LOTUS", "name": "MINISTER-M 254 EL BLUE MARBLE LOTUS BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 49280.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p132", "sku": "M-254EL BROWN LOTUS", "name": "MINISTER-M 254EL BROWN LOTUS", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 50000.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p133", "sku": "M242EL", "name": "Minister-M 242 EL SPARKLE RED BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 33033.0, "price": 47731.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p134", "sku": "M242", "name": "Minister-M 242", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 33033.0, "price": 45581.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p135", "sku": "MY-3AXG MAGNI", "name": "MY-3AXG MAGNIFICENT RED BLACK MATCH", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 35805.0, "price": 47204.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p136", "sku": "ECO+ BCD-290 REC FL GD Black", "name": "ECO+BCD-290 REC BLACK", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 44851.0, "price": 50400.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p137", "sku": "MY-302", "name": "MyOne Refrigerator", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 30030.0, "price": 48690.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p138", "sku": "01224EL", "name": "Minister-M 224 EL", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 31493.0, "price": 45581.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p139", "sku": "ECO+202 MAGLONIA", "name": "ECO+BCD-202 FL GD MAGLONIA BROWN WB", "category": "Refrigerator", "brand": "Other", "warranty": "12 বছর (Minister)", "cost": 30131.0, "price": 41500.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p140", "sku": "MINISTER M-224 EL CAMELLIA FLOWER", "name": "MINISTER-M 224 EL CAMELIA FLOWER BLACK", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 25238.0, "price": 42903.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p141", "sku": "ECO+252 Mangolia Marron", "name": "ECO+BCD-252 FL GD MAGLONIA BROWN WB", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 34379.0, "price": 47600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p142", "sku": "MINISTER M-310 EL WHITE", "name": "MINISTER M-310 EL WHITE PEONY", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 34573.0, "price": 50430.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p143", "sku": "M-165N RED SPIDER", "name": "MINISTER-M 165N RED SPIDER", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 24170.3, "price": 33753.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p144", "sku": "ECO+290", "name": "ECO+BCD-290 REC BLACK", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 43845.0, "price": 50700.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p145", "sku": "M-310 EL PEONY PARADISE", "name": "MINISTER-M 310EL PEONY PARADISE BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 36498.0, "price": 52043.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p146", "sku": "M-165 EL PURE BLACK", "name": "MINISTER-M 165 PURE BLACK", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 31790.0, "price": 34183.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p147", "sku": "ECO+195-Blue17", "name": "ECO+BCD-195 FL GD SPB Blue 17", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 34537.0, "price": 40900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p148", "sku": "M-170G RED CRIMSON (DEEP)", "name": "MINISTER M-170G RED CRIMSON (DEEP)", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 26103.0, "price": 35376.0, "stock": 1.0, "alertQty": 2, "inactive": true}, {"id": "p149", "sku": "01254EL", "name": "Minister-M 254 EL", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 43900.0, "price": 50000.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p150", "sku": "M256EL", "name": "Minister-M 256 EL", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 35035.0, "price": 50000.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p151", "sku": "ECO+ 235 FL GD", "name": "ECO+BCD-235 FL GD MAGLONIA BROWN WB", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 40280.0, "price": 46600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p152", "sku": "ECO142DEEPCHAM", "name": "ECO+BD-142 LITER FREEZER CHAMPAIGN", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 23981.0, "price": 28550.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p153", "sku": "M-310 BLUE MARBLE LOTUS", "name": "MINISTER-M 310 EL BLUE MARBLE LOTUS", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 0.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p154", "sku": "ECO+BCD-225 FL GD BLACK FEESIA", "name": "ECO+BCD-225 FL GD BLACK FEESIA", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 39690.0, "price": 44600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p155", "sku": "MY-1F5G DAHLIA", "name": "MY-1F5G DAHLIA BLACK MATCH", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 31.0, "price": 33753.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p156", "sku": "M-165EL BLACK BERRY STAR", "name": "minister Refrigerator", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 32490.0, "price": 34935.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p157", "sku": "470221", "name": "Vision Beverage 275", "category": "Refrigerator", "brand": "Vision", "warranty": "12 বছর (Minister)", "cost": 47000.0, "price": 58750.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p158", "sku": "ECO+ BCD-202 FL GD SPB Blue-17", "name": "ECO+BCD-202 FL GD SPB Blue-17", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 29723.0, "price": 42900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p159", "sku": "MINISTER M-242 WHITE PEONY", "name": "MINISTER M-242 EL PINK ROSE BLACK", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 32263.0, "price": 47204.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p160", "sku": "M- 350 EL PEONY PARADISE BLACK", "name": "MINISTER-M 350EL PEONY PARADISE BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 38423.0, "price": 55807.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p161", "sku": "ECO+195-Mangolia Brown", "name": "ECO+BCD-195 FL GD MAGLONIA BROWN WB", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 28292.0, "price": 41900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p162", "sku": "Myone 2E5G Daisy", "name": "Myone 2E5G Daisy", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 28200.0, "price": 39802.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p163", "sku": "MINISTER-M 266 EL RED PEONY BLACK", "name": "MINISTER-M 266 EL RED PEONY BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 49355.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p164", "sku": "01330", "name": "Minister-M 330", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 36200.0, "price": 54731.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p165", "sku": "M-350 EL GOLD MAGLONIA", "name": "MINISTER M-350 EL GOLD MAGLONIA BLACK", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 50900.0, "price": 54731.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p166", "sku": "M-310 BROWN", "name": "MINISTER-M 310 EL BROWN MARBLE LOTUS", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 33803.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p167", "sku": "M-242 EL GOLD MAGNOLIA BLACK", "name": "MINISTER-M 242EL GOLD MAGNOLIA BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 33033.0, "price": 48280.0, "stock": 4.0, "alertQty": 2, "inactive": false}, {"id": "p168", "sku": "M-310EL YELLOW SPIDER", "name": "MINISTER-M 310 EL YELLOW SPIDER", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p169", "sku": "ECO+ BCD-320 REC FL GD Red Wine", "name": "ECO+BCD-320 REC RED", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 46367.0, "price": 52100.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p170", "sku": "MY-1F5G GORGEOUS", "name": "MY-1F5G GORGEOUS TULIP BLACK MATCH", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 32490.0, "price": 34935.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p171", "sku": "M310EL", "name": "MINISTER-M 310 EL BLUE MARBLE LOTUS", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 36498.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p172", "sku": "ECO+225 FL GD Magnolia Brown", "name": "ECO+BCD-225 FL GD MAGLONIA BROWN", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 33272.0, "price": 44950.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p173", "sku": "MINISTER M-224 EL BOLD FLOWER", "name": "MINISTER-M 224 EL BOLD FLOWER MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 41900.0, "price": 45054.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p174", "sku": "M-350 EL ROYAL BLUE LOTUS", "name": "MINISTER-M 350EL ROYAL BLUE LOTUS BLACK TROLLEY MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 39193.0, "price": 55807.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p175", "sku": "MINISTER M-242 PINK ROSE", "name": "MINISTER M-242 EL PINK ROSE BLACK", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 41900.0, "price": 45054.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p176", "sku": "ECO+BCD-252", "name": "ECO+BCD-252 SPB Blue-17 WB", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 34379.0, "price": 47600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p177", "sku": "01225", "name": "Minister-M 225", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 40500.0, "price": 44505.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p178", "sku": "ECO+225-BLUE-17", "name": "ECO+BCD-225 FL GD BLUE 17", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 38799.0, "price": 44950.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p179", "sku": "https://ministerbd.com/minister-m-254-el-purple-java.html", "name": "MINISTER-M 254 EL BLUE MARBLE LOTUS BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p180", "sku": "ECO+225 GOLDEN LINE", "name": "ECO+BCD-225 FL GD GOLDEN LINE", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 38799.0, "price": 44950.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p181", "sku": "M- 242 EL PEONY PARADISE", "name": "MINISTER-M 242 EL PEONY PARADISE BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 33033.0, "price": 47204.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p182", "sku": "M-310EL DARK TIGER LILY", "name": "MINISTER-M 310EL DARK TIGER LILY", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p183", "sku": "Minister M-350 EL WHITE PEONY", "name": "MINISTER M-350 EL WHITE PEONY", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 37653.0, "price": 55806.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p184", "sku": "M-254 BLACK BERRY", "name": "MINISTER-M 254 BLACK BERRY STAR", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 34573.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p185", "sku": "MINISTER M-310 EL GRAY STYPE MIRROR MATCH", "name": "minister Refrigerator", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 45900.0, "price": 50430.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p186", "sku": "M-165 EL BLACK V-STYPE FULL MATCH", "name": "M-165 EL BLACK V-STYPE FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 32490.0, "price": 34935.0, "stock": 2.0, "alertQty": 2, "inactive": true}, {"id": "p187", "sku": "M-175G RED PEONY", "name": "MINISTER-M 175G RED PEONY", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 36190.0, "price": 38699.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p188", "sku": "01165", "name": "Minister-M 165N", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 21655.0, "price": 33753.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p189", "sku": "Minister M-350 EL BLACK", "name": "Minister-M 350 EL PURE FULL BLACK MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 48900.0, "price": 55807.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p190", "sku": "MY-1G5G DAISY", "name": "MY-1G5G RED DAISY BLACK MATCH", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 21500.0, "price": 38914.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p191", "sku": "M-224 EL DARK TIGER LILY", "name": "minister Refrigerator", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 39900.0, "price": 42903.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p192", "sku": "MINISTER M-242 EL CAMELLIA FLOWER", "name": "M-242 EL CAMELLIA FLOWER", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 42900.0, "price": 45054.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p193", "sku": "M-170G PALE BROWN", "name": "MINISTER-M 170G PALE BROWN (DEEP)", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 33900.0, "price": 36452.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p194", "sku": "MINISTER-M 254 EL PINK ROSE BLACK", "name": "MINISTER-M 254 EL PINK ROSE BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 48280.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p195", "sku": "ECO+202 Purple", "name": "ECO+BCD-202 FL GD Purple Azalea WB", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 30131.0, "price": 42900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p196", "sku": "1492735", "name": "MINISTER M-310 EL MAROON MAGLONIA BLACK", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 34573.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p197", "sku": "M-254 BLACK ZINNIA", "name": "MINISTER-M 254 BLACK ZINNIA MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 31881.0, "price": 48280.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p198", "sku": "ECO252FL", "name": "ECO+ BCD-252 FL GD Black Golden Line WB", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 41407.0, "price": 47600.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p199", "sku": "M-310 EL ROYAL BLUE LOTUS", "name": "MINISTER-M 310EL ROYAL BLUE LOTUS BLACK TROLLEY", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 36498.0, "price": 52043.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p200", "sku": "M-266 EL BLUE MARBLE", "name": "MINISTER-M 266 EL BLUE MARBLE LOTUS BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 45900.0, "price": 49355.0, "stock": 2.0, "alertQty": 2, "inactive": false}, {"id": "p201", "sku": "MINISTER M-306 EL MARBLE LOTUS", "name": "MINISTER M-306 EL MARBLE LOTUS", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 29690.0, "price": 51505.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p202", "sku": "01175", "name": "Minister-M 175G", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 26942.3, "price": 38699.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p203", "sku": "MINISTER-M 310 EL VINTAGE RASE", "name": "MINISTER-M 310 EL VANTAGE ROSE BLACK FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44900.0, "price": 48280.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p204", "sku": "MI-350", "name": "Minister-M 350 EL", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 38423.0, "price": 54731.0, "stock": 0.0, "alertQty": 2, "inactive": true}, {"id": "p205", "sku": "MY-2E6G DAHLIA", "name": "MY-256G DAHLIA", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 33540.0, "price": 48925.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p206", "sku": "M-175 EL BLACK BERRY STAR FULL MATCH", "name": "M-175 EL BLACK BERRY STAR FULL MATCH", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 35990.0, "price": 38699.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p207", "sku": "M-242 EL RED SPIDER", "name": "Minister-M 242EL RED SPIDER", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 44390.0, "price": 47731.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p208", "sku": "BT FD-630-WODGD Shining Gray", "name": "BT FD-630-WODGD Shining Gray", "category": "Refrigerator", "brand": "BUTTERFLY", "warranty": "12 বছর (Minister)", "cost": 124507.0, "price": 139900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p209", "sku": "ECO+BCD-202 BLACK RED LINE", "name": "ECO+BCD-202 FL GD BLACK RED LINE", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 30131.0, "price": 42900.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p210", "sku": "M-235G PALE BROWN (DEEP)", "name": "MINISTER-M 235G PALE BROWN (DEEP)", "category": "Refrigerator", "brand": "minister", "warranty": "12 বছর (Minister)", "cost": 31870.3, "price": 44505.0, "stock": 1.0, "alertQty": 2, "inactive": false}, {"id": "p211", "sku": "MYONE MY-1G5G ELEGANT MAGNOLIA", "name": "MY-1G5G ELEGANT MAGNOLIA", "category": "Refrigerator", "brand": "MyOne", "warranty": "12 বছর (Minister)", "cost": 22763.0, "price": 39129.0, "stock": -1.0, "alertQty": 2, "inactive": false}, {"id": "p212", "sku": "ECO+170 Black Freesia", "name": "ECO+ BCD-170 FL GD Black Freesia", "category": "Refrigerator", "brand": "ECO+", "warranty": "12 বছর (Minister)", "cost": 31325.0, "price": 35200.0, "stock": 0.0, "alertQty": 2, "inactive": false}, {"id": "p213", "sku": "MINISTER-M 225 EL VINTAGE ROSE BLACK", "name": "MINISTER-M 
